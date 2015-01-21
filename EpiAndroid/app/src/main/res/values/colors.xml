@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <color name="loginEdit">#C73D3639</color>
-    <color name="loginEditText">#ffffff</color>
-    <color name="toast_background">#FF353132</color>
-    <color name="toast_text">#FF0000</color>
-</resources>
