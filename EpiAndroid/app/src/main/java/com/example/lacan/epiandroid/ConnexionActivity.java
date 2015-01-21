@@ -62,30 +62,8 @@ public class ConnexionActivity extends Activity{
         enableStrictMode();
         if (login.length() > 0 && pwd.length() > 0)
         {
-            HttpClient httpclient = new DefaultHttpClient();
-            try {
-                URI serv = new URI("https://epitech-api.herokuapp.com/");
-                HttpPost httppost = new HttpPost(serv);
+            new ConnexionTask().execute(login, pwd);
 
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("login", login));
-                nameValuePairs.add(new BasicNameValuePair("password", pwd));
-                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-                HttpResponse httpresponse = httpclient.execute(httppost);
-
-                BufferedReader reader = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()));
-                String r = reader.readLine();
-                System.out.println("String is " + r);
-            }
-            catch (URISyntaxException e) {
-                System.out.println("syntax problem");
-            }
-            catch (ClientProtocolException e){
-                System.out.println("protocole exception " + e.getMessage());
-            }
-            catch (IOException e){
-                System.out.println("io exception " + e.getMessage());
-            }
         }
         else {
             LayoutInflater inflater = getLayoutInflater();
