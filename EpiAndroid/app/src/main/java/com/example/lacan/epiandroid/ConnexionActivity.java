@@ -24,6 +24,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -50,21 +53,14 @@ public class ConnexionActivity extends Activity{
         pwdInput = (EditText) findViewById(R.id.editPwd);
 
     }
-    public void enableStrictMode() {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
-        StrictMode.setThreadPolicy(policy);
-    }
-
-    public void sendInfos(View view) throws IOException {
+    public void sendInfos(View view) throws IOException, JSONException {
         String login = loginInput.getText().toString();
         String pwd = pwdInput.getText().toString();
 
-        enableStrictMode();
         if (login.length() > 0 && pwd.length() > 0)
         {
             new ConnexionTask(this).execute(login, pwd);
-
         }
         else {
             LayoutInflater inflater = getLayoutInflater();
@@ -81,11 +77,60 @@ public class ConnexionActivity extends Activity{
             toast.show();
         }
     }
+    public void manage_hostReturn() throws JSONException{
+        if (this.token.compareTo("io exception") == 0){
+            LayoutInflater inflater = getLayoutInflater();
+            View layout = inflater.inflate(R.layout.toast_layout,
+                    (ViewGroup) findViewById(R.id.toast_layout_root));
 
-    public void onBackgroundTaskCompleted(String s)
-    {
+            TextView text = (TextView) layout.findViewById(R.id.text);
+            text.setText("Impossible de se connecter au serveur, réessayez plus tard");
+
+            Toast toast = new Toast(getApplicationContext());
+            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setView(layout);
+            toast.show();
+        }
+        else{
+            JSonContainer cont = new JSonContainer(this.token);
+            this.token = cont.getStringfromKey("token");
+
+            if (this.token == null) {
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(R.layout.toast_layout,
+                        (ViewGroup) findViewById(R.id.toast_layout_root));
+
+                TextView text = (TextView) layout.findViewById(R.id.text);
+                text.setText("Mauvais identifiant/mot de passe");
+
+                Toast toast = new Toast(getApplicationContext());
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.setDuration(Toast.LENGTH_SHORT);
+                toast.setView(layout);
+                toast.show();
+            }
+            else{
+                LayoutInflater inflater = getLayoutInflater();
+                View layout = inflater.inflate(R.layout.toast_layout,
+                        (ViewGroup) findViewById(R.id.toast_layout_root));
+
+                TextView text = (TextView) layout.findViewById(R.id.text);
+                text.setText("Connexion établie");
+
+                Toast toast = new Toast(getApplicationContext());
+                toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+                toast.setDuration(Toast.LENGTH_LONG);
+                toast.setView(layout);
+                toast.show();
+            }
+        }
+    }
+    public void onBackgroundTaskCompleted(String s) throws JSONException {
         this.token = s;
         System.out.println("resultat de la tache de fond : " + this.token);
+        manage_hostReturn();
+
     }
 
     @Override

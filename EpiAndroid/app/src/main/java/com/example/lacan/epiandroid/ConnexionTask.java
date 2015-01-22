@@ -11,6 +11,7 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -56,10 +57,9 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
         } catch (ClientProtocolException e) {
             return ( "protocole exception " + e.getMessage());
         } catch (IOException e) {
-            return ("io exception " + e.getMessage());
+            return ("io exception");
         }
             }
-
     @Override
     protected void onProgressUpdate(Integer... values) {
         super.onProgressUpdate(values);
@@ -68,6 +68,10 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        this._obj.onBackgroundTaskCompleted(s);
+        try {
+            this._obj.onBackgroundTaskCompleted(s);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
