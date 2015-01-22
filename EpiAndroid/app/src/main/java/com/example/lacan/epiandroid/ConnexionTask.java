@@ -22,6 +22,12 @@ import java.util.List;
 
 public class ConnexionTask extends AsyncTask<String, Integer, String>
 {
+    ConnexionActivity _obj;
+
+    ConnexionTask(ConnexionActivity obj)
+    {
+        this._obj = obj;
+    }
 
     @Override
     protected void onPreExecute() {
@@ -62,6 +68,6 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        System.out.println("resultat de la tache de fond : " + s);
+        this._obj.onBackgroundTaskCompleted(s);
     }
 }

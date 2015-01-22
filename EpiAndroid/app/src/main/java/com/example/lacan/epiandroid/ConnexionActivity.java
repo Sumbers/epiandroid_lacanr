@@ -38,6 +38,7 @@ public class ConnexionActivity extends Activity{
     private Button connect = null;
     private EditText loginInput = null;
     private EditText pwdInput = null;
+    private String token = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +63,7 @@ public class ConnexionActivity extends Activity{
         enableStrictMode();
         if (login.length() > 0 && pwd.length() > 0)
         {
-            new ConnexionTask().execute(login, pwd);
+            new ConnexionTask(this).execute(login, pwd);
 
         }
         else {
@@ -79,6 +80,12 @@ public class ConnexionActivity extends Activity{
             toast.setView(layout);
             toast.show();
         }
+    }
+
+    public void onBackgroundTaskCompleted(String s)
+    {
+        this.token = s;
+        System.out.println("resultat de la tache de fond : " + this.token);
     }
 
     @Override
