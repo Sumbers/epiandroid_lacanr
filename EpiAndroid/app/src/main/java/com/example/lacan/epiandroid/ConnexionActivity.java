@@ -51,7 +51,6 @@ public class ConnexionActivity extends Activity{
         connect = (Button) findViewById(R.id.connectButton);
         loginInput = (EditText) findViewById(R.id.editLogin);
         pwdInput = (EditText) findViewById(R.id.editPwd);
-
     }
 
     public void sendInfos(View view) throws IOException, JSONException {
