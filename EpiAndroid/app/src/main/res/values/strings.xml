@@ -7,5 +7,17 @@
     <string name="loginInput">Login</string>
     <string name="pwdInput">Mot de passe UNIX</string>
     <string name="connexion">Se connecter</string>
+    <string name="title_activity_welcome">WelcomeActivity</string>
+    <string name="title_section1">Accueil</string>
+    <string name="title_section2">Planning</string>
+    <string name="title_section3">Valider token</string>
+    <string name="title_section4">Notes</string>
+    <string name="title_section5">Projets</string>
+    <string name="title_section6">Modules</string>
+    <string name="title_section7">Susies</string>
+    <string name="title_section8">Trombi</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>
 
 </resources>
