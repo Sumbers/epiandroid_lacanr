@@ -1,6 +1,7 @@
 package com.example.lacan.epiandroid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import java.util.List;
 
 
 public class ConnexionActivity extends Activity{
+    public static final String SESSION = "com.example.lacan.epiandroid.SESSION";
     private Button connect = null;
     private EditText loginInput = null;
     private EditText pwdInput = null;
@@ -122,6 +124,10 @@ public class ConnexionActivity extends Activity{
                 toast.setDuration(Toast.LENGTH_LONG);
                 toast.setView(layout);
                 toast.show();
+
+                Intent intent = new Intent(ConnexionActivity.this, WelcomeActivity.class);
+                intent.putExtra(SESSION, this.token);
+                startActivity(intent);
             }
         }
     }

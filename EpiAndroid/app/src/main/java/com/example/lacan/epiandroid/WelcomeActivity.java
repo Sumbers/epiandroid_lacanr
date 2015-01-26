@@ -1,6 +1,7 @@
 package com.example.lacan.epiandroid;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -45,6 +46,9 @@ public class WelcomeActivity extends ActionBarActivity
         mNavigationDrawerFragment.setUp(
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
+        Intent i = getIntent();
+        String token = i.getStringExtra(ConnexionActivity.SESSION);
+        System.out.println("La session est : " + token);
     }
 
     @Override
