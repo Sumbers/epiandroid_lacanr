@@ -38,7 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ConnexionActivity extends Activity{
+public class ConnexionActivity extends Activity implements MyActivity
+{
     public static final String SESSION = "com.example.lacan.epiandroid.SESSION";
     private Button connect = null;
     private EditText loginInput = null;
@@ -61,10 +62,11 @@ public class ConnexionActivity extends Activity{
 
         if (login.length() > 0 && pwd.length() > 0)
         {
-            new ConnexionTask(this).execute(login, pwd);
+            new ConnexionTask(this).execute(String.valueOf(2), "login", "login", login, "password", pwd);
         }
-        else {
-            LayoutInflater inflater = getLayoutInflater();
+        else
+        {
+           LayoutInflater inflater = getLayoutInflater();
             View layout = inflater.inflate(R.layout.toast_layout,
                     (ViewGroup) findViewById(R.id.toast_layout_root));
 

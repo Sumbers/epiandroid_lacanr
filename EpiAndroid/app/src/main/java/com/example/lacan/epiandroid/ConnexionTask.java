@@ -1,6 +1,7 @@
 package com.example.lacan.epiandroid;
 
 
+import android.app.Activity;
 import android.os.AsyncTask;
 
 import org.apache.http.HttpResponse;
@@ -23,9 +24,9 @@ import java.util.List;
 
 public class ConnexionTask extends AsyncTask<String, Integer, String>
 {
-    ConnexionActivity _obj;
+    MyActivity _obj;
 
-    ConnexionTask(ConnexionActivity obj)
+    ConnexionTask(MyActivity obj)
     {
         this._obj = obj;
     }
@@ -39,12 +40,20 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     protected String doInBackground(String... params) {
         HttpClient httpclient = new DefaultHttpClient();
         try {
-            URI serv = new URI("https://epitech-api.herokuapp.com/login");
+            int nb;
+
+            nb = Integer.parseInt(params[0]);
+            URI serv = new URI("https://epitech-api.herokuapp.com/" + params[1]);
             HttpPost httppost = new HttpPost(serv);
 
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("login", params[0]));
-            nameValuePairs.add(new BasicNameValuePair("password", params[1]));
+            int i = 2;
+            int max = 2 + nb * 2;
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(nb);
+            while (i < max)
+            {
+                nameValuePairs.add(new BasicNameValuePair(params[i], params[i + 1]));
+                i = i + 2;
+            }
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpResponse httpresponse = httpclient.execute(httppost);
             publishProgress(50);
