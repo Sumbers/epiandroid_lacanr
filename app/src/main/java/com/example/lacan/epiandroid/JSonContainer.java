@@ -9,17 +9,30 @@ public class JSonContainer {
         private JSONObject obj = null;
         private JSONArray ar = null;
         private String value = null;
+        private JSONTokener tok = null;
 
     public JSONObject get_next_valueObj(String serializable){
         try {
-            this.obj = (JSONObject) new JSONTokener(serializable).nextValue();
+            tok = new JSONTokener(serializable);
+            this.obj = (JSONObject) tok.nextValue();
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return (this.obj);
     }
-
+    public JSONObject get_next_valueObj()
+    {
+        try
+        {
+            return ((JSONObject) tok.nextValue());
+        }
+        catch (JSONException e)
+        {
+            e.printStackTrace();
+        }
+        return ((JSONObject) JSONObject.NULL);
+    }
     public String getStringfromKey(String key)
     {
         try {

@@ -31,6 +31,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
     private ImageView pictureView = null;
     private String log = null;
 
+
     //permet d'envoyer des données à l'initialisation du fragment
     public static AccueilFragment newInstance(String session) {
         AccueilFragment af = new AccueilFragment();
@@ -49,15 +50,17 @@ public class AccueilFragment extends Fragment implements MyActivity {
     }
 
     public void getInfosAccueil() {
-        if (this._session != null) {
+        if (this._session != null)
+        {
             new ConnexionTask(this).execute("1", "infos", "token", this._session);
+            new ConnexionTask(this).execute("1", "messages", "token", this._session);
         }
     }
 
     public void onBackgroundTaskCompleted(String infos) {
-        this.infoUser = infos;
+        //this.infoUser = infos;
         System.out.println("page accueil retour telechargement : " + infos);
-        manage_hostReturn();
+        manage_hostReturn(infos);
     }
 
     public void onBackgroundTaskCompleted(Bitmap img) {
@@ -66,22 +69,41 @@ public class AccueilFragment extends Fragment implements MyActivity {
     }
 
 
-    private void manage_hostReturn() {
+    private void manage_hostReturn(String infos) {
         if (this.infoUser.compareTo("io exception") == 0) {
             System.out.println("Vous êtes déconnécté du serveur");
         } else {
             JSonContainer cont = new JSonContainer();
             JSONObject obj = null;
-            obj = cont.get_next_valueObj(this.infoUser);
+            obj = cont.get_next_valueObj(infos);
             try
             {
-                JSONObject obj2 = obj.getJSONObject("current");
-                this.log = obj2.getString("active_log");
-                System.out.println("log :" + this.log);
-                obj2 = obj.getJSONObject("infos");
-                this.login = obj2.getString("login");
-                new DownloadImgTask(this).execute("https://cdn.local.epitech.eu/userprofil/profilview/" + this.login + ".jpg" );
+                if (obj.isNull("current") == false)
+                {
+                    JSONObject obj2 = obj.getJSONObject("current");
+                    this.log = obj2.getString("active_log");
+                    System.out.println("log :" + this.log);
+                    obj2 = obj.getJSONObject("infos");
+                    this.login = obj2.getString("login");
+                    new DownloadImgTask(this).execute("https://cdn.local.epitech.eu/userprofil/profilview/" + this.login + ".jpg");
+                }
+                else
+                {
+                    JSONObject obj2;
+                    do
+                    {
+                        // on fait ce qu'on doit avec obj.getString("title");
 
+                        obj2 = obj.getJSONObject("user");
+                        // on fait ce qu'on doit avec obj2.getString("title");
+                        // on fait ce qu'on doit avec obj2.getString("url");
+
+                        // on fait ce qu'on doit avec obj.getString("content");
+                        // on fait ce qu'on doit avec obj.getString("date");
+                        System.out.println("log :" + this.log);
+
+                    } while ((obj = cont.get_next_valueObj()) != JSONObject.NULL);
+                }
 
             } catch (JSONException e) {
                 e.printStackTrace();
