@@ -20,6 +20,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,35 +55,21 @@ class DownloadImgTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     // Once the image is downloaded, associates it to the imageView
     protected void onPostExecute(Bitmap bitmap) {
-        if (isCancelled()) {
-            bitmap = null;
+        if (bitmap != null) {
+            this._obj.onBackgroundTaskCompleted(this._img);
         }
-        this._obj.onBackgroundTaskCompleted(this._img);
+        System.out.println("Image null");
     }
 
     static Bitmap downloadBitmap(String link) {
-        HttpClient httpclient = new DefaultHttpClient();
+        Bitmap mIcon11 = null;
+        System.out.println("Lien : " + link);
         try {
-            URI serv = new URI(link);
-            HttpGet httpRequest = new HttpGet(link);
-            HttpResponse httpresponse = httpclient.execute(httpRequest);
-            HttpEntity entity = httpresponse.getEntity();
-            BufferedHttpEntity bufferedHttpEntity = new BufferedHttpEntity(entity);
-            InputStream is = bufferedHttpEntity.getContent();
-            Bitmap myBitMap = BitmapFactory.decodeStream(is);
-            return (myBitMap);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            System.out.println("probleme URL mal formée");
-            return null;
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("IO EXCEPTION");
-            return null;
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            System.out.println("UrI mal formée");
-            return null;
+            InputStream in = new java.net.URL(link).openStream();
+            mIcon11 = BitmapFactory.decodeStream(new BufferedInputStream(in));
+        } catch (Exception e) {
+            Log.d("Error", e.getMessage());
         }
+        return mIcon11;
     }
 }

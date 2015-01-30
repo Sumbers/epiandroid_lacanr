@@ -10,9 +10,15 @@ public class JSonContainer {
         private JSONArray ar = null;
         private String value = null;
 
-        JSonContainer(String serializable) throws JSONException {
+    public JSONObject get_next_valueObj(String serializable){
+        try {
             this.obj = (JSONObject) new JSONTokener(serializable).nextValue();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+        return (this.obj);
+    }
 
     public String getStringfromKey(String key)
     {

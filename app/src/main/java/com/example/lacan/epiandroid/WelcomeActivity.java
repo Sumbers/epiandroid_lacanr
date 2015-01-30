@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 public class WelcomeActivity extends ActionBarActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
+    private String _session = null;
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
@@ -47,16 +48,26 @@ public class WelcomeActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 (DrawerLayout) findViewById(R.id.drawer_layout));
         Intent i = getIntent();
-        String token = i.getStringExtra(ConnexionActivity.SESSION);
-        System.out.println("La session est : " + token);
+        this._session = i.getStringExtra(ConnexionActivity.SESSION);
+        System.out.println("La session est : " + this._session);
     }
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment obj = null;
+        switch (position)
+        {
+            case 0:
+                obj = AccueilFragment.newInstance(this._session);
+                break;
+
+        }
+
+        // update the main content by replacing fragments
+
         fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
+                .replace(R.id.container, obj)
                 .commit();
     }
 
@@ -97,20 +108,6 @@ public class WelcomeActivity extends ActionBarActivity
         actionBar.setTitle(mTitle);
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        if (!mNavigationDrawerFragment.isDrawerOpen()) {
-            // Only show items in the action bar relevant to this screen
-            // if the drawer is not showing. Otherwise, let the drawer
-            // decide what to show in the action bar.
-            getMenuInflater().inflate(R.menu.welcome, menu);
-            restoreActionBar();
-            return true;
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -149,13 +146,6 @@ public class WelcomeActivity extends ActionBarActivity
         }
 
         public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_welcome, container, false);
-            return rootView;
         }
 
         @Override

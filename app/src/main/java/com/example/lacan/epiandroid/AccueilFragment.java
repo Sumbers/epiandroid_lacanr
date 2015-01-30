@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
     private String infoUser = null;
     private Bitmap profilPicture = null;
     private String login = null;
+    private TextView waitView = null;
     private TextView logView = null;
     private ImageView pictureView = null;
     private String log = null;
@@ -39,6 +41,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootview = inflater.inflate(R.layout.accueil_layout, container, false);
         System.out.println("Fragment accueil : Session : " + this._session);
+        waitView = (TextView) rootview.findViewById(R.id.wait);
         logView = (TextView) rootview.findViewById(R.id.logTime);
         pictureView = (ImageView) rootview.findViewById(R.id.userPicture);
         getInfosAccueil();
@@ -77,7 +80,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
                 System.out.println("log :" + this.log);
                 obj2 = obj.getJSONObject("infos");
                 this.login = obj2.getString("login");
-                new DownloadImgTask(this).execute("http://cdn.local.epitech.eu/userprofil/" + this.login + ".bmp" );
+                new DownloadImgTask(this).execute("https://cdn.local.epitech.eu/userprofil/" + this.login + ".bmp" );
 
 
             } catch (JSONException e) {
@@ -90,6 +93,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
 
     public void setDataToView()
     {
+        ((RelativeLayout)waitView.getParent()).removeView(waitView);
         this.logView.setText("Temps de log ces 7 derniers jours : " + this.log);
         this.pictureView.setImageBitmap(this.profilPicture);
     }
