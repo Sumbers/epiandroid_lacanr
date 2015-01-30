@@ -80,7 +80,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
                 System.out.println("log :" + this.log);
                 obj2 = obj.getJSONObject("infos");
                 this.login = obj2.getString("login");
-                new DownloadImgTask(this).execute("https://cdn.local.epitech.eu/userprofil/" + this.login + ".bmp" );
+                new DownloadImgTask(this).execute("https://cdn.local.epitech.eu/userprofil/profilview/" + this.login + ".jpg" );
 
 
             } catch (JSONException e) {

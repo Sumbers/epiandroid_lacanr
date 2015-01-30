@@ -22,6 +22,7 @@ import org.json.JSONException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -38,7 +39,6 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 class DownloadImgTask extends AsyncTask<String, Void, Bitmap> {
-    private Bitmap _img;
     AccueilFragment _obj;
 
     public DownloadImgTask(AccueilFragment frag) {
@@ -54,22 +54,71 @@ class DownloadImgTask extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     // Once the image is downloaded, associates it to the imageView
-    protected void onPostExecute(Bitmap bitmap) {
-        if (bitmap != null) {
-            this._obj.onBackgroundTaskCompleted(this._img);
+    protected void onPostExecute(Bitmap img) {
+        if (img != null) {
+            this._obj.onBackgroundTaskCompleted(img);
         }
-        System.out.println("Image null");
+        else
+            System.out.println("Image null");
     }
 
-    static Bitmap downloadBitmap(String link) {
-        Bitmap mIcon11 = null;
+    public Bitmap downloadBitmap(String link) {
+        Bitmap img = null;
         System.out.println("Lien : " + link);
         try {
             InputStream in = new java.net.URL(link).openStream();
-            mIcon11 = BitmapFactory.decodeStream(new BufferedInputStream(in));
+            img = BitmapFactory.decodeStream(new FlushedInputStream(in));
         } catch (Exception e) {
             Log.d("Error", e.getMessage());
         }
-        return mIcon11;
+        return img;
+    }
+
+    static class FlushedInputStream extends FilterInputStream {
+
+        /**
+         * The constructor that takes in the InputStream reference.
+         *
+         * @param inputStream the input stream reference.
+         */
+        public FlushedInputStream(final InputStream inputStream) {
+            super(inputStream);
+        }
+
+        /**
+         * Overriding the skip method to actually skip n bytes.
+         * This implementation makes sure that we actually skip
+         * the n bytes no matter what.
+         * {@inheritDoc}
+         */
+        @Override
+        public long skip(final long n) throws IOException {
+            long totalBytesSkipped = 0L;
+            //If totalBytesSkipped is equal to the required number
+            //of bytes to be skipped i.e. "n"
+            //then come out of the loop.
+            while (totalBytesSkipped < n) {
+                //Skipping the left out bytes.
+                long bytesSkipped = in.skip(n - totalBytesSkipped);
+                //If number of bytes skipped is zero then
+                //we need to check if we have reached the EOF
+                if (bytesSkipped == 0L) {
+                    //Reading the next byte to find out whether we have reached EOF.
+                    int bytesRead = read();
+                    //If bytes read count is less than zero (-1) we have reached EOF.
+                    //Cant skip any more bytes.
+                    if (bytesRead < 0) {
+                        break;  // we reached EOF
+                    } else {
+                        //Since we read one byte we have actually
+                        //skipped that byte hence bytesSkipped = 1
+                        bytesSkipped = 1; // we read one byte
+                    }
+                }
+                //Adding the bytesSkipped to totalBytesSkipped
+                totalBytesSkipped += bytesSkipped;
+            }
+            return totalBytesSkipped;
+        }
     }
 }
