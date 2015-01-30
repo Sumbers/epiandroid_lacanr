@@ -1,7 +1,6 @@
 package com.example.lacan.epiandroid;
 
 
-import android.app.Activity;
 import android.os.AsyncTask;
 
 import org.apache.http.HttpResponse;
@@ -22,11 +21,11 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ConnexionTask extends AsyncTask<String, Integer, String>
+public class AccueilTask extends AsyncTask<String, Integer, String>
 {
-    MyActivity _obj;
+    AccueilFragment _obj;
 
-    ConnexionTask(MyActivity obj)
+    AccueilTask(AccueilFragment obj)
     {
         this._obj = obj;
     }
@@ -40,26 +39,22 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     protected String doInBackground(String... params) {
         HttpClient httpclient = new DefaultHttpClient();
         try {
-            int nb;
-
-            nb = Integer.parseInt(params[0]);
-            URI serv = new URI("https://epitech-api.herokuapp.com/" + params[1]);
+            URI serv = new URI("https://epitech-api.herokuapp.com/infos");
             HttpPost httppost = new HttpPost(serv);
 
-            int i = 2;
-            int max = 2 + nb * 2;
-            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(nb);
-            while (i < max)
-            {
-                nameValuePairs.add(new BasicNameValuePair(params[i], params[i + 1]));
-                i = i + 2;
-            }
+            List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+            nameValuePairs.add(new BasicNameValuePair("token", params[0]));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
             HttpResponse httpresponse = httpclient.execute(httppost);
             publishProgress(50);
             BufferedReader reader = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()));
             publishProgress(100);
-            return (reader.readLine());
+            String s;
+            String response = null;
+            response = reader.readLine();
+            while ((s = reader.readLine()) != null)
+                response += s;
+            return (response);
         }
         catch (URISyntaxException e) {
             return ("syntax problem");
@@ -77,10 +72,6 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        try {
-            this._obj.onBackgroundTaskCompleted(s);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        this._obj.onBackgroundTaskCompleted(s);
     }
 }
