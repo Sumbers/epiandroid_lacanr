@@ -8,7 +8,9 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +21,8 @@ import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AccueilFragment extends Fragment implements MyActivity {
     private View rootview = null;
@@ -52,8 +56,8 @@ public class AccueilFragment extends Fragment implements MyActivity {
     public void getInfosAccueil() {
         if (this._session != null)
         {
-            new ConnexionTask(this).execute("1", "infos", "token", this._session);
-            new ConnexionTask(this).execute("1", "messages", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.POST).execute("1", "infos", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.GET).execute("1", "messages", "token", this._session);
         }
     }
 
@@ -70,9 +74,14 @@ public class AccueilFragment extends Fragment implements MyActivity {
 
 
     private void manage_hostReturn(String infos) {
-        if (this.infoUser.compareTo("io exception") == 0) {
+        /*if (this.infoUser.compareTo("io exception") == 0) {
             System.out.println("Vous êtes déconnécté du serveur");
-        } else {
+        } */
+        if (infos.compareTo("io exception") == 0)
+        {
+            System.out.println("Vous êtes déconnécté du serveur");
+        }
+        else {
             JSonContainer cont = new JSonContainer();
             JSONObject obj = null;
             obj = cont.get_next_valueObj(infos);
@@ -90,20 +99,27 @@ public class AccueilFragment extends Fragment implements MyActivity {
                 else
                 {
                     JSONObject obj2;
+                    String line;
+                    List<String> values = new LinkedList<String>();
                     do
                     {
-                        // on fait ce qu'on doit avec obj.getString("title");
+                        line = "title: " + obj.getString("title") + "\n";
 
                         obj2 = obj.getJSONObject("user");
-                        // on fait ce qu'on doit avec obj2.getString("title");
+
+                        line += "teacher: " + obj2.getString("title") + "\n";
                         // on fait ce qu'on doit avec obj2.getString("url");
 
-                        // on fait ce qu'on doit avec obj.getString("content");
-                        // on fait ce qu'on doit avec obj.getString("date");
-                        System.out.println("log :" + this.log);
-
+                        line += "teacher: " + obj.getString("content") + "\n";
+                        line += "date: " + obj.getString("date") + "\n";
+                        values.add(line);
                     } while ((obj = cont.get_next_valueObj()) != JSONObject.NULL);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1, android.R.id.text1, values);
+                    ListView listView = (ListView) getView().findViewById(R.id.listMsg);
+                    listView.setAdapter(adapter);
                 }
+
 
             } catch (JSONException e) {
                 e.printStackTrace();

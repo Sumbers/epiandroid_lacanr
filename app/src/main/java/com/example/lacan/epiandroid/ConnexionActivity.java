@@ -61,7 +61,7 @@ public class ConnexionActivity extends Activity implements MyActivity{
 
         if (login.length() > 0 && pwd.length() > 0)
         {
-            new ConnexionTask(this).execute("2","login", "login", login, "password", pwd);
+            new ConnexionTask(this, ConnexionTask.POST).execute("2","login", "login", login, "password", pwd);
         }
         else
         {
