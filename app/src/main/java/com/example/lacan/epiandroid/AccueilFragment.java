@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,8 +34,8 @@ public class AccueilFragment extends Fragment implements MyActivity {
     private TextView waitView = null;
     private TextView logView = null;
     private ImageView pictureView = null;
+    private ListView listView = null;
     private String log = null;
-
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static AccueilFragment newInstance(String session) {
@@ -49,20 +50,20 @@ public class AccueilFragment extends Fragment implements MyActivity {
         waitView = (TextView) rootview.findViewById(R.id.wait);
         logView = (TextView) rootview.findViewById(R.id.logTime);
         pictureView = (ImageView) rootview.findViewById(R.id.userPicture);
+        ListView listView = (ListView) rootview.findViewById(R.id.listMsg);
         getInfosAccueil();
         return rootview;
     }
 
     public void getInfosAccueil() {
-        if (this._session != null)
-        {
+        if (this._session != null) {
             new ConnexionTask(this, ConnexionTask.POST).execute("1", "infos", "token", this._session);
             new ConnexionTask(this, ConnexionTask.GET).execute("1", "messages", "token", this._session);
         }
     }
 
     public void onBackgroundTaskCompleted(String infos) {
-        //this.infoUser = infos;
+        this.infoUser = infos;
         System.out.println("page accueil retour telechargement : " + infos);
         manage_hostReturn(infos);
     }
@@ -74,21 +75,19 @@ public class AccueilFragment extends Fragment implements MyActivity {
 
 
     private void manage_hostReturn(String infos) {
-        /*if (this.infoUser.compareTo("io exception") == 0) {
-            System.out.println("Vous êtes déconnécté du serveur");
-        } */
-        if (infos.compareTo("io exception") == 0)
+        if (this.infoUser.compareTo("io exception") == 0)
         {
             System.out.println("Vous êtes déconnécté du serveur");
         }
-        else {
+        else
+        {
             JSonContainer cont = new JSonContainer();
             JSONObject obj = null;
-            obj = cont.get_next_valueObj(infos);
+
             try
             {
-                if (obj.isNull("current") == false)
-                {
+                obj = cont.get_next_valueObj(infos);
+                if (obj.isNull("current") == false) {
                     JSONObject obj2 = obj.getJSONObject("current");
                     this.log = obj2.getString("active_log");
                     System.out.println("log :" + this.log);
@@ -103,10 +102,10 @@ public class AccueilFragment extends Fragment implements MyActivity {
                     List<String> values = new LinkedList<String>();
                     do
                     {
+
                         line = "title: " + obj.getString("title") + "\n";
 
                         obj2 = obj.getJSONObject("user");
-
                         line += "teacher: " + obj2.getString("title") + "\n";
                         // on fait ce qu'on doit avec obj2.getString("url");
 
@@ -116,12 +115,11 @@ public class AccueilFragment extends Fragment implements MyActivity {
                     } while ((obj = cont.get_next_valueObj()) != JSONObject.NULL);
                     ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                    ListView listView = (ListView) getView().findViewById(R.id.listMsg);
-                    listView.setAdapter(adapter);
+                    this.listView.setAdapter(adapter);
+
                 }
-
-
-            } catch (JSONException e) {
+            }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
         }
