@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
     private TextView waitView = null;
     private TextView logView = null;
     private ImageView pictureView = null;
+    private ListView listView = null;
     private String log = null;
     private ListView listMsg = null;
 
@@ -85,7 +87,8 @@ public class AccueilFragment extends Fragment implements MyActivity {
         {
             System.out.println("Vous êtes déconnécté du serveur");
         }
-        else {
+        else
+        {
             JSonContainer cont = new JSonContainer();
             JSONObject obj = null;
             try
@@ -127,13 +130,11 @@ public class AccueilFragment extends Fragment implements MyActivity {
                     listMsg.setAdapter(adapter);
                 }
 
-
-            } catch (JSONException e) {
+                }
+            catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     public void setDataToView()
@@ -143,4 +144,3 @@ public class AccueilFragment extends Fragment implements MyActivity {
         this.pictureView.setImageBitmap(this.profilPicture);
     }
 }
-
