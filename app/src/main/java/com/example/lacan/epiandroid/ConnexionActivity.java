@@ -61,7 +61,7 @@ public class ConnexionActivity extends Activity implements MyActivity{
 
         if (login.length() > 0 && pwd.length() > 0)
         {
-            new ConnexionTask(this, ConnexionTask.POST).execute("2","login", "login", login, "password", pwd);
+            new ConnexionTask(this, ConnexionTask.POST, ConnexionTask.OBJECT).execute("2","login", "login", login, "password", pwd);
         }
         else
         {
@@ -132,7 +132,7 @@ public class ConnexionActivity extends Activity implements MyActivity{
             }
         }
     }
-    public void onBackgroundTaskCompleted(String s) throws JSONException {
+    public void onBackgroundTaskCompleted(String s, int type) throws JSONException {
         this.token = s;
         System.out.println("resultat de la tache de fond : " + this.token);
         manage_hostReturn();

@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
@@ -34,7 +37,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
     private TextView logView = null;
     private ImageView pictureView = null;
     private String log = null;
-
+    private ListView listMsg = null;
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static AccueilFragment newInstance(String session) {
@@ -49,6 +52,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
         waitView = (TextView) rootview.findViewById(R.id.wait);
         logView = (TextView) rootview.findViewById(R.id.logTime);
         pictureView = (ImageView) rootview.findViewById(R.id.userPicture);
+        listMsg = (ListView) rootview.findViewById(R.id.listMsg);
         getInfosAccueil();
         return rootview;
     }
@@ -56,15 +60,15 @@ public class AccueilFragment extends Fragment implements MyActivity {
     public void getInfosAccueil() {
         if (this._session != null)
         {
-            new ConnexionTask(this, ConnexionTask.POST).execute("1", "infos", "token", this._session);
-            new ConnexionTask(this, ConnexionTask.GET).execute("1", "messages", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.POST, ConnexionTask.OBJECT).execute("1", "infos", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("1", "messages", "token", this._session);
         }
     }
 
-    public void onBackgroundTaskCompleted(String infos) {
+    public void onBackgroundTaskCompleted(String infos, int type) {
         //this.infoUser = infos;
         System.out.println("page accueil retour telechargement : " + infos);
-        manage_hostReturn(infos);
+        manage_hostReturn(infos, type);
     }
 
     public void onBackgroundTaskCompleted(Bitmap img) {
@@ -73,7 +77,7 @@ public class AccueilFragment extends Fragment implements MyActivity {
     }
 
 
-    private void manage_hostReturn(String infos) {
+    private void manage_hostReturn(String infos, int type) {
         /*if (this.infoUser.compareTo("io exception") == 0) {
             System.out.println("Vous êtes déconnécté du serveur");
         } */
@@ -84,11 +88,11 @@ public class AccueilFragment extends Fragment implements MyActivity {
         else {
             JSonContainer cont = new JSonContainer();
             JSONObject obj = null;
-            obj = cont.get_next_valueObj(infos);
             try
             {
-                if (obj.isNull("current") == false)
+                if (type == ConnexionTask.OBJECT)
                 {
+                    obj = cont.get_next_valueObj(infos);
                     JSONObject obj2 = obj.getJSONObject("current");
                     this.log = obj2.getString("active_log");
                     System.out.println("log :" + this.log);
@@ -98,26 +102,29 @@ public class AccueilFragment extends Fragment implements MyActivity {
                 }
                 else
                 {
+                    JSONArray arr = cont.get_array(infos);
                     JSONObject obj2;
                     String line;
-                    List<String> values = new LinkedList<String>();
-                    do
+                    List<Spanned> values = new LinkedList<Spanned>();
+                    int i = 0;
+                    while (i < arr.length())
                     {
-                        line = "title: " + obj.getString("title") + "\n";
+                        obj = arr.getJSONObject(i);
+                        line = "title: " + obj.getString("title") + "<br/>";
 
                         obj2 = obj.getJSONObject("user");
 
-                        line += "teacher: " + obj2.getString("title") + "\n";
+                        line += "user: " + obj2.getString("title") + "<br/>";
                         // on fait ce qu'on doit avec obj2.getString("url");
 
-                        line += "teacher: " + obj.getString("content") + "\n";
-                        line += "date: " + obj.getString("date") + "\n";
-                        values.add(line);
-                    } while ((obj = cont.get_next_valueObj()) != JSONObject.NULL);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                        line += "content: " + obj.getString("content") + "<br/>";
+                        line += "date: " + obj.getString("date") + "<br/>";
+                        values.add(Html.fromHtml(line));
+                        i++;
+                    }
+                    ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                    ListView listView = (ListView) getView().findViewById(R.id.listMsg);
-                    listView.setAdapter(adapter);
+                    listMsg.setAdapter(adapter);
                 }
 
 

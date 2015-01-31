@@ -72,6 +72,6 @@ public class AccueilTask extends AsyncTask<String, Integer, String>
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        this._obj.onBackgroundTaskCompleted(s);
+        this._obj.onBackgroundTaskCompleted(s, ConnexionTask.OBJECT);
     }
 }

@@ -28,8 +28,6 @@
     <ListView
         android:id="@+id/listMsg"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_centerVertical="true"
-        android:layout_alignRight="@+id/logTime"
-        android:layout_alignEnd="@+id/logTime"/>
+        android:layout_height="match_parent"
+        android:layout_below="@+id/userPicture"/>
 </RelativeLayout>

@@ -30,13 +30,18 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     public static final int GET = 0;
     public static final int POST = 1;
     public static final int DELETE = 2;
+    public static final int ARRAY = 0;
+    public static final int OBJECT = 1;
 
     MyActivity _obj = null;
     private int request;
-    ConnexionTask(MyActivity obj, int req)
+    private int type;
+
+    ConnexionTask(MyActivity obj, int req, int typ)
     {
         this._obj = obj;
         this.request = req;
+        this.type = typ;
     }
 
     @Override
@@ -152,7 +157,7 @@ public class ConnexionTask extends AsyncTask<String, Integer, String>
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         try {
-            this._obj.onBackgroundTaskCompleted(s);
+            this._obj.onBackgroundTaskCompleted(s, this.type);
         } catch (JSONException e) {
             e.printStackTrace();
         }

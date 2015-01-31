@@ -9,29 +9,25 @@ public class JSonContainer {
         private JSONObject obj = null;
         private JSONArray ar = null;
         private String value = null;
-        private JSONTokener tok = null;
 
     public JSONObject get_next_valueObj(String serializable){
         try {
-            tok = new JSONTokener(serializable);
-            this.obj = (JSONObject) tok.nextValue();
+            this.obj = (JSONObject) new JSONTokener(serializable).nextValue();
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return (this.obj);
     }
-    public JSONObject get_next_valueObj()
+    public JSONArray get_array(String serializable)
     {
-        try
-        {
-            return ((JSONObject) tok.nextValue());
-        }
-        catch (JSONException e)
-        {
+        try {
+            return (JSONArray) new JSONTokener(serializable).nextValue();
+
+        } catch (JSONException e) {
             e.printStackTrace();
         }
-        return ((JSONObject) JSONObject.NULL);
+        return (null);
     }
     public String getStringfromKey(String key)
     {
