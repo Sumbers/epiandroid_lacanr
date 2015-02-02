@@ -51,7 +51,8 @@
         android:textColorHint="@color/loginEditText"
         android:paddingLeft="@dimen/paddingLoginEditText"
         android:inputType="textVisiblePassword"
-        android:id="@+id/editPwd"/>
+        android:id="@+id/editPwd"
+        android:password="true" />
 
     <Button
         android:layout_width="wrap_content"

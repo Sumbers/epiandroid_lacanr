@@ -61,7 +61,9 @@ public class WelcomeActivity extends ActionBarActivity
             case 0:
                 obj = AccueilFragment.newInstance(this._session);
                 break;
-
+            case 4:
+                obj = NotesFragment.newInstance(this._session);
+                break;
         }
 
         // update the main content by replacing fragments
