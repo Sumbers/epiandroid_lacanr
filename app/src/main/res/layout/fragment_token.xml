@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/activatedBackgroundIndicator">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:text="Chargement des données veuillez patienter..."
+        android:id="@+id/wait"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:maxLength="8"
+        android:id="@+id/editToken"
+        android:inputType="number"
+        android:gravity="center"/>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/editToken"
+        android:text="OK"
+        android:onClick="sendToken"
+        android:id="@+id/validateToken"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/validateToken"
+        android:gravity="center"
+        android:id="@+id/periode"/>
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/periode"
+        android:layout_centerVertical="true"
+        android:id="@+id/listActivity"/>
+</RelativeLayout>

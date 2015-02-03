@@ -78,7 +78,6 @@ public class PlanningFragment extends Fragment implements MyActivity {
                 JSONObject obj = null;
                 String titre = null;
                 int i =  ar.length() - 1;
-
                 while (i >= 0)
                 {
                     obj = ar.getJSONObject(i);
@@ -130,11 +129,14 @@ public class PlanningFragment extends Fragment implements MyActivity {
 
     public void setDataToView()
     {
+        RelativeLayout tmp;
+
         this.formater.applyPattern("dd-MM-yyyy");
         String startToSend = formater.format(this.start);
         String endToSend = formater.format(this.end);
         System.out.println("AFFICHAGE !!");
-        //((RelativeLayout)waitView.getParent()).removeView(waitView);
+        tmp = ((RelativeLayout)waitView.getParent());
+        tmp.removeView(waitView);
        this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
     }
 }

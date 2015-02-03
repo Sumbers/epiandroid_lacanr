@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -32,6 +33,7 @@ public class SusieFragment extends Fragment implements MyActivity {
     private View rootview = null;
     private String _session = null;
     private ListView listSusies = null;
+    private List<Spanned> values;
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static SusieFragment newInstance(String session) {
@@ -44,6 +46,7 @@ public class SusieFragment extends Fragment implements MyActivity {
         rootview = inflater.inflate(R.layout.fragment_susie, container, false);
         System.out.println("Fragment accueil : Session : " + this._session);
         listSusies = (ListView) rootview.findViewById(R.id.listSusie);
+        values = new LinkedList<Spanned>();
         getInfosAccueil();
         return rootview;
     }
@@ -82,7 +85,7 @@ public class SusieFragment extends Fragment implements MyActivity {
                     JSONObject obj2;
                     JSONObject susie;
                     String line;
-                    List<Spanned> values = new LinkedList<Spanned>();
+
                     int i = 0;
                     int j;
                     while (i < arr.length())

@@ -102,11 +102,11 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section1),
+                        "Accueil",
                         getString(R.string.title_section2),
                         getString(R.string.title_section3),
                         getString(R.string.title_section4),
-                        getString(R.string.title_section5),
+                        "Projets",
                         getString(R.string.title_section6),
                         getString(R.string.title_section7),
                         getString(R.string.title_section8)
