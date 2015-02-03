@@ -28,30 +28,30 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NotesFragment extends Fragment implements MyActivity {
+public class ProjectFragment extends Fragment implements MyActivity {
     private View rootview = null;
     private String _session = null;
-    private ListView listNotes = null;
+    private ListView listProjects = null;
 
     //permet d'envoyer des données à l'initialisation du fragment
-    public static NotesFragment newInstance(String session) {
-        NotesFragment af = new NotesFragment();
+    public static ProjectFragment newInstance(String session) {
+        ProjectFragment af = new ProjectFragment();
         af._session = session;
         return (af);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootview = inflater.inflate(R.layout.fragment_notes, container, false);
+        rootview = inflater.inflate(R.layout.fragment_project, container, false);
         System.out.println("Fragment notes : Session : " + this._session);
-        listNotes = (ListView) rootview.findViewById(R.id.listNotes);
-        getNotes();
+        listProjects = (ListView) rootview.findViewById(R.id.listProjects);
+        getProjects();
         return rootview;
     }
 
-    public void getNotes() {
+    public void getProjects() {
         if (this._session != null)
         {
-            new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("1", "marks", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("1", "projects", "token", this._session);
         }
     }
 
@@ -78,26 +78,31 @@ public class NotesFragment extends Fragment implements MyActivity {
             {
                 if (type == ConnexionTask.ARRAY)
                 {
-                    JSONObject tab = cont.get_object(infos);
-                    JSONArray arr = tab.getJSONArray("notes");
+                    /*JSONObject tab = cont.get_object(infos);
+                    JSONArray arr = tab.getJSONArray("notes");*/
+                    JSONArray arr = cont.get_array(infos);
                     String line;
                     List<Spanned> values = new LinkedList<Spanned>();
                     int i = 0;
                     while (i < arr.length())
                     {
                         obj = arr.getJSONObject(i);
-                        line = "Module: " + obj.getString("titlemodule") + "<br/>";
-
-                        line += "Projet: " + obj.getString("title") + "<br/>";
-                        line += "Date: " + obj.getString("date") + "<br/>";
-                        line += "Note: " + obj.getString("final_note") + "<br/>";
-                        line += "Commentaire: " + obj.getString("comment") + "<br/>";
+                        if (obj.getInt("registred") == 1) {
+                            line = "--- INSCRIT ---<br/>";
+                        } else {
+                            line = "NON INSCRIT<br/>";
+                        }
+                        line += "Projet: " + obj.getString("project") + "<br/>";
+                        line += "Titre: " + obj.getString("acti_title") + "<br/>";
+                        line += "Module: " + obj.getString("title_module") + "<br/>";
+                        line += "Début: " + obj.getString("begin_acti") + "<br/>";
+                        line += "Fin: " + obj.getString("end_acti") + "<br/>";
                         values.add(Html.fromHtml(line));
                         i++;
                     }
                     ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                    listNotes.setAdapter(adapter);
+                    listProjects.setAdapter(adapter);
                 }
 
             }

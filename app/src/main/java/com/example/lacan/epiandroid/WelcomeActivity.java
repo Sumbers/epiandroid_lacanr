@@ -64,6 +64,12 @@ public class WelcomeActivity extends ActionBarActivity
             case 3:
                 obj = NotesFragment.newInstance(this._session);
                 break;
+            case 4:
+                obj = ProjectFragment.newInstance(this._session);
+                break;
+            case 5:
+                obj = ModuleFragment.newInstance(this._session);
+                break;
             case 6:
                 obj = SusieFragment.newInstance(this._session);
                 break;

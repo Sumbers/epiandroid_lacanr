@@ -28,36 +28,36 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class NotesFragment extends Fragment implements MyActivity {
+public class ModuleFragment extends Fragment implements MyActivity {
     private View rootview = null;
     private String _session = null;
-    private ListView listNotes = null;
+    private ListView listModules = null;
 
     //permet d'envoyer des données à l'initialisation du fragment
-    public static NotesFragment newInstance(String session) {
-        NotesFragment af = new NotesFragment();
+    public static ModuleFragment newInstance(String session) {
+        ModuleFragment af = new ModuleFragment();
         af._session = session;
         return (af);
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootview = inflater.inflate(R.layout.fragment_notes, container, false);
+        rootview = inflater.inflate(R.layout.fragment_module, container, false);
         System.out.println("Fragment notes : Session : " + this._session);
-        listNotes = (ListView) rootview.findViewById(R.id.listNotes);
-        getNotes();
+        listModules = (ListView) rootview.findViewById(R.id.listModules);
+        getModules();
         return rootview;
     }
 
-    public void getNotes() {
+    public void getModules() {
         if (this._session != null)
         {
-            new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("1", "marks", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("1", "modules", "token", this._session);
         }
     }
 
     public void onBackgroundTaskCompleted(String infos, int type) {
         //this.infoUser = infos;
-        System.out.println("page notes retour telechargement : " + infos);
+        System.out.println("page modules retour telechargement : " + infos);
         manage_hostReturn(infos, type);
     }
 
@@ -79,25 +79,27 @@ public class NotesFragment extends Fragment implements MyActivity {
                 if (type == ConnexionTask.ARRAY)
                 {
                     JSONObject tab = cont.get_object(infos);
-                    JSONArray arr = tab.getJSONArray("notes");
+                    JSONArray arr = tab.getJSONArray("modules");
                     String line;
                     List<Spanned> values = new LinkedList<Spanned>();
                     int i = 0;
                     while (i < arr.length())
                     {
                         obj = arr.getJSONObject(i);
-                        line = "Module: " + obj.getString("titlemodule") + "<br/>";
+                        line = "Module: " + obj.getString("title") + "<br/>";
+                        line += "Date: " + obj.getString("date_ins") + "<br/>";
 
-                        line += "Projet: " + obj.getString("title") + "<br/>";
-                        line += "Date: " + obj.getString("date") + "<br/>";
-                        line += "Note: " + obj.getString("final_note") + "<br/>";
-                        line += "Commentaire: " + obj.getString("comment") + "<br/>";
+                        line += "Code: " + obj.getString("codemodule") + "<br/>";
+                        line += "Grade: " + obj.getString("grade") + "<br/>";
+                        line += "Crédits: " + obj.getString("credits") + "<br/>";
+                        line += "Semestre: " + obj.getString("semester") + " (cycle " + obj.getString("cycle") + ") <br/>";
+
                         values.add(Html.fromHtml(line));
                         i++;
                     }
                     ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                    listNotes.setAdapter(adapter);
+                    listModules.setAdapter(adapter);
                 }
 
             }
