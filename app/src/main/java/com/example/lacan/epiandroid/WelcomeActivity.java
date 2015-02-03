@@ -61,6 +61,9 @@ public class WelcomeActivity extends ActionBarActivity
             case 0:
                 obj = AccueilFragment.newInstance(this._session);
                 break;
+            case 1:
+                obj = PlanningFragment.newInstance(this._session);
+                break;
             case 3:
                 obj = NotesFragment.newInstance(this._session);
                 break;
@@ -73,6 +76,7 @@ public class WelcomeActivity extends ActionBarActivity
             case 6:
                 obj = SusieFragment.newInstance(this._session);
                 break;
+
         }
 
         // update the main content by replacing fragments
