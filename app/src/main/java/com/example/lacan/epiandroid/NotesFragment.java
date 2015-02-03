@@ -58,7 +58,7 @@ public class NotesFragment extends Fragment implements MyActivity {
 
     public void onBackgroundTaskCompleted(String infos, int type) {
         //this.infoUser = infos;
-        System.out.println("page accueil retour telechargement : " + infos);
+        System.out.println("page notes retour telechargement : " + infos);
         manage_hostReturn(infos, type);
     }
 
@@ -66,6 +66,7 @@ public class NotesFragment extends Fragment implements MyActivity {
         /*if (this.infoUser.compareTo("io exception") == 0) {
             System.out.println("Vous êtes déconnécté du serveur");
         } */
+        System.out.println("Test : " + infos);
         if (infos.compareTo("io exception") == 0)
         {
             System.out.println("Vous êtes déconnecté du serveur");
@@ -78,20 +79,20 @@ public class NotesFragment extends Fragment implements MyActivity {
             {
                 if (type == ConnexionTask.ARRAY)
                 {
-                    JSONArray arr = cont.get_array(infos);
+                    JSONObject tab = cont.get_object(infos);
+                    JSONArray arr = tab.getJSONArray("notes");
                     String line;
                     List<Spanned> values = new LinkedList<Spanned>();
                     int i = 0;
                     while (i < arr.length())
                     {
                         obj = arr.getJSONObject(i);
-                        line = "module: " + obj.getString("titlemodule") + "<br/>";
+                        line = "Module: " + obj.getString("titlemodule") + "<br/>";
 
-                        line += "projet: " + obj.getString("title") + "<br/>";
-                        // on fait ce qu'on doit avec obj2.getString("url");
-                        line += "date: " + obj.getString("date") + "<br/>";
-                        line += "note: " + obj.getString("final_note") + "<br/>";
-                        line += "commentaire: " + obj.getString("comment") + "<br/>";
+                        line += "Projet: " + obj.getString("title") + "<br/>";
+                        line += "Date: " + obj.getString("date") + "<br/>";
+                        line += "Note: " + obj.getString("final_note") + "<br/>";
+                        line += "Commentaire: " + obj.getString("comment") + "<br/>";
                         values.add(Html.fromHtml(line));
                         i++;
                     }
@@ -106,9 +107,4 @@ public class NotesFragment extends Fragment implements MyActivity {
             }
         }
     }
-
-    /*public void setDataToView()
-    {
-        ((RelativeLayout)waitView.getParent()).removeView(waitView);
-    }*/
 }

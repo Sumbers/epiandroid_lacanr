@@ -19,6 +19,7 @@ public class JSonContainer {
         }
         return (this.obj);
     }
+
     public JSONArray get_array(String serializable)
     {
         try {
@@ -29,6 +30,18 @@ public class JSonContainer {
         }
         return (null);
     }
+
+    public JSONObject get_object(String serializable)
+    {
+        try {
+            return (JSONObject) new JSONTokener(serializable).nextValue();
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return (null);
+    }
+
     public String getStringfromKey(String key)
     {
         try {
