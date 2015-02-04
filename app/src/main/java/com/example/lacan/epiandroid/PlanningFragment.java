@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
@@ -32,6 +33,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
     private View rootview = null;
     private TextView period = null;
     private String _session = null;
+    private Date current = new Date();
     private Date start = null;
     private Date end = null;
     private TextView waitView = null;
@@ -42,6 +44,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
     private SimpleDateFormat formatGet = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SimpleDateFormat formatDay = new SimpleDateFormat("EEEE");
     private SimpleDateFormat formatHour = new SimpleDateFormat("HH");
+    private SimpleDateFormat formatDisplay = new SimpleDateFormat("dd-MM-yyyy");
     List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     private SimpleAdapter adapteur = null;
     private int nbAct = 0;
@@ -59,10 +62,28 @@ public class PlanningFragment extends Fragment implements MyActivity {
         period = (TextView) rootview.findViewById(R.id.periode);
         waitView = (TextView) rootview.findViewById(R.id.wait);
         activityListView = (ListView) rootview.findViewById(R.id.listActivity);
-        setTime();
+        setTime(0);
         setequiv();
         //récuperer les infos de /planning GET
         getWeekActivity();
+        rootview.findViewById(R.id.nextWeekButton).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                list.clear();
+                setTime(1);
+                getWeekActivity();
+            }
+    });
+        rootview.findViewById(R.id.precWeekButton).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                list.clear();
+                setTime(-1);
+                getWeekActivity();
+            }
+        });
         return rootview;
     }
 
@@ -104,6 +125,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
         {
           try
             {
+                System.out.println("infos = " + infos );
                 JSonContainer cont = new JSonContainer();
                 JSONArray ar = cont.get_array(infos);
                 JSONObject obj = null;
@@ -213,8 +235,8 @@ public class PlanningFragment extends Fragment implements MyActivity {
     }
 
     //set la date du début et de la fin de la semaine en cours
-    public void setTime() {
-        this.start = new Date();
+    public void setTime(int when) {
+        this.start = this.current;
         //récupère le jour de la semaine au format long
         Calendar cale = Calendar.getInstance();
         //initialise le calendier a la date courrante
@@ -228,8 +250,21 @@ public class PlanningFragment extends Fragment implements MyActivity {
             //on set la date avec le calendrier
             this.start = cale.getTime();
             System.out.println("WTF");
+            //si on veut la semaine suivante
         }
-        this.end = new Date();
+        if (when == 1)
+        {
+            //on ajoute 7 jours au lundi en cours
+            cale.add(Calendar.DATE, 7);
+            this.start = cale.getTime();
+        }
+        else if (when == -1)
+        {
+            //on retire 7 jours au lundi en cours
+            cale.add(Calendar.DATE, -7);
+            this.start = cale.getTime();
+        }
+        this.end = this.current;
         cale.setTime(this.end);
         while (formatDay.format(this.end).compareTo("Sunday") != 0)
         {
@@ -239,17 +274,30 @@ public class PlanningFragment extends Fragment implements MyActivity {
             this.end = cale.getTime();
             System.out.println("WTF2");
         }
+        if (when == 1)
+        {
+            //on ajoute 7 jours au dimanche en cours
+            cale.add(Calendar.DATE, 7);
+            this.end = cale.getTime();
+        }
+        else if (when == -1)
+        {
+            //on retire 7 jours au dimanche en cours
+            cale.add(Calendar.DATE, -7);
+            this.end = cale.getTime();
+        }
+        this.current = this.start;
     }
 
     public void setDataToView()
     {
-        this.formatSent.applyPattern("dd-MM-yyyy");
-        String startToSend = formatSent.format(this.start);
-        String endToSend = formatSent.format(this.end);
+        String startToSend = formatDisplay.format(this.start);
+        String endToSend = formatDisplay.format(this.end);
         System.out.println("AFFICHAGE !!");
         if (nbAct > 0)
         {
-            ((RelativeLayout)waitView.getParent()).removeView(waitView);
+            waitView.setVisibility(View.GONE);
+            activityListView.setVisibility(View.VISIBLE);
             this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
             String[] from = {"jour", "activity", "room", "start"};
             int[] to = {R.id.jour, R.id.activity, R.id.room, R.id.hour};
@@ -260,7 +308,10 @@ public class PlanningFragment extends Fragment implements MyActivity {
         }
         else
         {
+            System.out.println("il 'y a rien");
+            activityListView.setVisibility(View.GONE);
             this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
+            waitView.setVisibility(View.VISIBLE);
             waitView.setText("Rien à afficher");
         }
     }
