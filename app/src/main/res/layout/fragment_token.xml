@@ -24,7 +24,6 @@
         android:layout_height="50dp"
         android:layout_below="@id/editToken"
         android:text="OK"
-        android:onClick="sendToken"
         android:id="@+id/validateToken"/>
     <TextView
         android:layout_width="match_parent"

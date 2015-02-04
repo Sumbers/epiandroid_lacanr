@@ -40,6 +40,7 @@ public class TokenFragment extends Fragment implements MyActivity {
     private TextView waitView = null;
     private String infos = null;
     private int indexActivity = 0;
+    private TokenFragment _this = this; // pour le onClickListener, on ne peut pas passer this.
 
     public static TokenFragment newInstance(String session) {
         TokenFragment pf = new TokenFragment();
@@ -59,31 +60,33 @@ public class TokenFragment extends Fragment implements MyActivity {
         setTime();
         //récuperer les infos de /planning GET
         getWeekActivity();
+        rootview.findViewById(R.id.validateToken).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                if (editToken.length() == 8)
+                {
+                    JSONObject obj = listActInfos.get(indexActivity);
+
+                    try
+                    {
+                        new ConnexionTask(_this, ConnexionTask.POST, ConnexionTask.OBJECT).execute("4", "token",
+                                "token", _session,
+                                "scolaryear", obj.getString("scolaryear"),
+                                "codemodule", obj.getString("codemodule"),
+                                "codeinstance", obj.getString("codeinstance"),
+                                "codeacti", obj.getString("codeacti"),
+                                "codeevent", obj.getString("codeevent"),
+                                "tokenvalidationcode", editToken.getText().toString());
+                    }
+                    catch (JSONException e)
+                    {
+                        System.out.println("exception lors de sentToken: " + e.getMessage());
+                    }
+                }
+            }
+        });
         return rootview;
-    }
-
-    public void sendToken()
-    {
-        if (editToken.length() == 8)
-        {
-            JSONObject obj = listActInfos.get(indexActivity);
-
-            try
-            {
-                new ConnexionTask(this, ConnexionTask.POST, ConnexionTask.OBJECT).execute("4", "token",
-                        "token", this._session,
-                        "scolaryear", obj.getString("scolaryear"),
-                        "codemodule", obj.getString("codemodule"),
-                        "codeinstance", obj.getString("codeinstance"),
-                        "codeacti", obj.getString("codeacti"),
-                        "codeevent", obj.getString("codeevent"),
-                        "tokenvalidationcode", editToken.getText().toString());
-            }
-            catch (JSONException e)
-            {
-                System.out.println("exception lors de sentToken: " + e.getMessage());
-            }
-        }
     }
 
     private void getWeekActivity() {
