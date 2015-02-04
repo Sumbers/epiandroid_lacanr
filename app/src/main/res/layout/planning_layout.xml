@@ -17,29 +17,10 @@
         android:gravity="center"
         android:id="@+id/periode"/>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:id="@+id/jour"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/activity"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/room"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/hour"/>
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_centerVertical="true"
+        android:layout_height="500dp"
+        android:layout_below="@id/periode"
         android:id="@+id/listActivity"/>
 </RelativeLayout>

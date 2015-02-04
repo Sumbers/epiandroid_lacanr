@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +42,9 @@ public class PlanningFragment extends Fragment implements MyActivity {
     private SimpleDateFormat formatGet = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SimpleDateFormat formatDay = new SimpleDateFormat("EEEE");
     private SimpleDateFormat formatHour = new SimpleDateFormat("HH");
-    private ArrayList<Map<String, String>> list = null;
+    List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     private SimpleAdapter adapteur = null;
+    private int nbAct = 0;
 
     public static PlanningFragment newInstance(String session) {
         PlanningFragment pf = new PlanningFragment();
@@ -100,12 +102,11 @@ public class PlanningFragment extends Fragment implements MyActivity {
         }
         else
         {
-            try
+          try
             {
                 JSonContainer cont = new JSonContainer();
                 JSONArray ar = cont.get_array(infos);
                 JSONObject obj = null;
-                String day = "";
                 int i = 0;
 
                 //test
@@ -114,8 +115,6 @@ public class PlanningFragment extends Fragment implements MyActivity {
                 String room = null;
                 String heureStart = null;
                 String activity = null;
-                Map map = null;
-                int newDay = 0;
                 while (i < ar.length())
                 {
                     obj = ar.getJSONObject(i);
@@ -125,38 +124,34 @@ public class PlanningFragment extends Fragment implements MyActivity {
                        System.out.println("TOUT VA BIEN");
                         if ((jour = getActivityDayInFrench(obj.getString("start"))) != null)
                         {
-                            map = new Hashtable();
+                            HashMap<String, String> map = new HashMap<String, String>();
                             System.out.println("TOUT VA BIEN2");
                             if (jour.compareTo(jourPrec) != 0)
                             {
                                jourPrec = jour;
                                System.out.println("TOUT VA BIEN3");
-                               map.put("jour", jour);
-
+                              map.put("jour", jour);
                             }
                             System.out.println("TOUT VA BIEN4");
                             System.out.println("JOUR en cours : " + jour);
                             System.out.println("Nom activité : " + activity);
-                            map.put("activité", activity);
+                            map.put("activity", activity);
                             room = obj.getJSONObject("room").getString("code");
                             map.put("room", room);
                             System.out.println("La salle est : " + room);
                              if ((heureStart = getStartHour(obj.getString("start"))) != null)
                              {
-                                map.put("start", heureStart);
+                                map.put("start", heureStart + "H");
                                 System.out.println("Heure de départ : " + heureStart);
                                 list.add(map);
                                 System.out.println("TOUT VA BIEN5");
+                                nbAct++;
                              }
                         }
                     }
                     i++;
                 }
-                String[] from = {"jour", "activité", "room", "start"};
-                int[] to = {R.id.jour, R.id.activity, R.id.room, R.id.hour};
-                this.adapteur = new SimpleAdapter(getActivity(), list,
-                        android.R.layout.simple_list_item_1, from, to);
-                activityListView.setAdapter(this.adapteur);
+                System.out.println("MISE EN PLACE ADAPTEUR !!");
             }
             catch (JSONException e)
             {
@@ -167,6 +162,19 @@ public class PlanningFragment extends Fragment implements MyActivity {
                 System.err.println("ERREUR MOTHER FOCKER");
                 e.printStackTrace();
             }
+
+        /*int i = 0;
+        while (i < 10)
+        {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put("jour", "jour" + i);
+            map.put("activity", "activity" + i);
+            map.put("room", "room" + i);
+            map.put("start", "start" + i);
+            list.add(map);
+            i++;
+        }*/
+
         setDataToView();
         }
     }
@@ -239,7 +247,21 @@ public class PlanningFragment extends Fragment implements MyActivity {
         String startToSend = formatSent.format(this.start);
         String endToSend = formatSent.format(this.end);
         System.out.println("AFFICHAGE !!");
-        ((RelativeLayout)waitView.getParent()).removeView(waitView);
-       this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
+        if (nbAct > 0)
+        {
+            ((RelativeLayout)waitView.getParent()).removeView(waitView);
+            this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
+            String[] from = {"jour", "activity", "room", "start"};
+            int[] to = {R.id.jour, R.id.activity, R.id.room, R.id.hour};
+            this.adapteur = new SimpleAdapter(getActivity(), list,
+                    R.layout.list_planning_layout, from, to);
+            activityListView.setAdapter(this.adapteur);
+            nbAct = 0;
+        }
+        else
+        {
+            this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
+            waitView.setText("Rien à afficher");
+        }
     }
 }
