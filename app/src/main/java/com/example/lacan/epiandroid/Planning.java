@@ -50,36 +50,16 @@ public class Planning
             {
                 e.printStackTrace();
             }
-            /*goodTitle = 1;
-            while (goodTitle != 0)
-            {
-                try {
-                    _obj.add(indexList, ar.getJSONObject(i));
-                    if (i >= 0) {
-                        _obj.get(indexList).getString("acti_title");
-                        goodTitle = 0;
-                        indexList++;
-                    }
-                    else
-                        break;
-                }
-                //si l'activité est une suzie (sinon ça exceptionne)
-                catch (Exception e)
-                {
-                    _obj.remove(indexList);
-                    if (i >= 0)
-                        i--;
-                    else
-                        break;
-                }
-            }
-            if (goodTitle == 1)
-                break;*/
         }
-        //_nbAct = indexList;
         System.out.println("il y a " + _nbAct + " activités cette semaine");
         setequiv();
+        try {
+            setActivities(_nbAct, _obj);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
 
     public void onlyRegistered() throws JSONException {
         int only = 0;
@@ -163,7 +143,7 @@ public class Planning
        sortActivities();
     }
     //trie les activité en ordre chronologique
-    
+
     private void sortActivities() {
         Collections.sort(_activities, new Comparator<HashMap<String, String>>() {
             @Override

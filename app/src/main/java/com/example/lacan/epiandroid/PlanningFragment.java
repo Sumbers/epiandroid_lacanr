@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -37,6 +38,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
     private Date start = null;
     private Date end = null;
     private TextView waitView = null;
+    private RadioGroup filtre = null;
     private String infos = null;
     private ListView activityListView = null;
     private SimpleDateFormat formatSent = new SimpleDateFormat("yyyy-MM-dd");
@@ -47,6 +49,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
     List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     private SimpleAdapter adapteur = null;
     private int nbAct = 0;
+    private int filtreNb;
 
     public static PlanningFragment newInstance(String session) {
         PlanningFragment pf = new PlanningFragment();
@@ -61,6 +64,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
         period = (TextView) rootview.findViewById(R.id.periode);
         waitView = (TextView) rootview.findViewById(R.id.wait);
         activityListView = (ListView) rootview.findViewById(R.id.listActivity);
+        filtre = (RadioGroup) rootview.findViewById(R.id.filtre);
         setTime(0);
         //récuperer les infos de /planning GET
         getWeekActivity();
@@ -68,7 +72,8 @@ public class PlanningFragment extends Fragment implements MyActivity {
             @Override
             public void onClick(View v)
             {
-                list.clear();
+                if (list != null)
+                    list.clear();
                 setTime(1);
                 getWeekActivity();
             }
@@ -80,6 +85,38 @@ public class PlanningFragment extends Fragment implements MyActivity {
                 if (list != null)
                     list.clear();
                 setTime(-1);
+                getWeekActivity();
+            }
+        });
+        rootview.findViewById(R.id.register).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                System.out.println("trololo");
+                filtreNb = 0;
+                if (list != null)
+                    list.clear();
+                setTime(0);
+                getWeekActivity();
+            }
+        });
+        rootview.findViewById(R.id.promo).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                System.out.println("trololo");
+                filtreNb = 1;
+            }
+        });
+        rootview.findViewById(R.id.all).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                System.out.println("trololo");
+                filtreNb = 2;
+                if (list != null)
+                    list.clear();
+                setTime(0);
                 getWeekActivity();
             }
         });
@@ -110,22 +147,42 @@ public class PlanningFragment extends Fragment implements MyActivity {
         }
         else
         {
-            System.out.println("infos = " + infos );
             JSonContainer cont = new JSonContainer();
             JSONArray ar = cont.get_array(infos);
-            Planning plan = new Planning(ar);
-            try {
-                plan.onlyRegistered();
-                if ((list = plan.get_activities()) != null)
-                    nbAct = list.size();
-                else
-                    nbAct = 0;
-                setDataToView();
-            }
-            catch(JSONException e)
+            System.out.println("infos = " + infos );
+            switch (filtreNb)
             {
-                e.printStackTrace();
+                case 0:
+                {
+                    Planning plan = new Planning(ar);
+                    try {
+                        plan.onlyRegistered();
+                        if ((list = plan.get_activities()) != null)
+                            nbAct = list.size();
+                        else
+                            nbAct = 0;
+                    }
+                    catch(JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+               case 1:
+                {
+                    break;
+                }
+                case 2:
+                {
+                    Planning plan = new Planning(ar);
+                    if ((list = plan.get_activities()) != null)
+                        nbAct = list.size();
+                    else
+                        nbAct = 0;
+                    break;
+                }
             }
+            setDataToView();
         }
     }
 

@@ -31,9 +31,37 @@
         android:layout_alignParentEnd="true"
         android:id="@+id/nextWeekButton"
         />
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/periode"
+        android:id="@+id/filtre">
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="enregistré"
+            android:id="@+id/register"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="promo"
+            android:id="@+id/promo"/>
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="tout"
+            android:id="@+id/all"/>
+    </RadioGroup>
+
     <ListView
         android:layout_width="match_parent"
         android:layout_height="500dp"
-        android:layout_below="@id/periode"
+        android:layout_below="@id/filtre"
         android:id="@+id/listActivity"/>
+
 </RelativeLayout>
