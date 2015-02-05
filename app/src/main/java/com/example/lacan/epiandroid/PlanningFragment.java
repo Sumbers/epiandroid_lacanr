@@ -38,7 +38,6 @@ public class PlanningFragment extends Fragment implements MyActivity {
     private Date end = null;
     private TextView waitView = null;
     private String infos = null;
-    private Map date_equivalent = new Hashtable();
     private ListView activityListView = null;
     private SimpleDateFormat formatSent = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat formatGet = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -63,7 +62,6 @@ public class PlanningFragment extends Fragment implements MyActivity {
         waitView = (TextView) rootview.findViewById(R.id.wait);
         activityListView = (ListView) rootview.findViewById(R.id.listActivity);
         setTime(0);
-        setequiv();
         //récuperer les infos de /planning GET
         getWeekActivity();
         rootview.findViewById(R.id.nextWeekButton).setOnClickListener(new AdapterView.OnClickListener() {
@@ -79,24 +77,13 @@ public class PlanningFragment extends Fragment implements MyActivity {
             @Override
             public void onClick(View v)
             {
-                list.clear();
+                if (list != null)
+                    list.clear();
                 setTime(-1);
                 getWeekActivity();
             }
         });
         return rootview;
-    }
-
-    void setequiv()
-    {
-        this.date_equivalent.put("Monday", "Lundi");
-
-        this.date_equivalent.put("Tuesday", "Mardi");
-        this.date_equivalent.put("Wednesday", "Mercredi");
-        this.date_equivalent.put("Thursday", "Jeudi");
-        this.date_equivalent.put("Friday", "Vendredi");
-        this.date_equivalent.put("Saturday", "Samedi");
-        this.date_equivalent.put("Sunday", "Dimanche");
     }
 
     private void getWeekActivity() {
@@ -123,115 +110,23 @@ public class PlanningFragment extends Fragment implements MyActivity {
         }
         else
         {
-          try
-            {
-                System.out.println("infos = " + infos );
-                JSonContainer cont = new JSonContainer();
-                JSONArray ar = cont.get_array(infos);
-                JSONObject obj = null;
-                int i = 0;
-
-                //test
-                String jour = null;
-                String jourPrec = " ";
-                String room = null;
-                String heureStart = null;
-                String activity = null;
-                while (i < ar.length())
-                {
-                    obj = ar.getJSONObject(i);
-                    //si on est inscrit à l'activité
-                    if (obj.getString("event_registered") != "null" && ((activity = obj.getString("acti_title")) != "null"))
-                    {
-                       System.out.println("TOUT VA BIEN");
-                        if ((jour = getActivityDayInFrench(obj.getString("start"))) != null)
-                        {
-                            HashMap<String, String> map = new HashMap<String, String>();
-                            System.out.println("TOUT VA BIEN2");
-                            if (jour.compareTo(jourPrec) != 0)
-                            {
-                               jourPrec = jour;
-                               System.out.println("TOUT VA BIEN3");
-                              map.put("jour", jour);
-                            }
-                            System.out.println("TOUT VA BIEN4");
-                            System.out.println("JOUR en cours : " + jour);
-                            System.out.println("Nom activité : " + activity);
-                            map.put("activity", activity);
-                            room = obj.getJSONObject("room").getString("code");
-                            map.put("room", room);
-                            System.out.println("La salle est : " + room);
-                             if ((heureStart = getStartHour(obj.getString("start"))) != null)
-                             {
-                                map.put("start", heureStart + "H");
-                                System.out.println("Heure de départ : " + heureStart);
-                                list.add(map);
-                                System.out.println("TOUT VA BIEN5");
-                                nbAct++;
-                             }
-                        }
-                    }
-                    i++;
-                }
-                System.out.println("MISE EN PLACE ADAPTEUR !!");
+            System.out.println("infos = " + infos );
+            JSonContainer cont = new JSonContainer();
+            JSONArray ar = cont.get_array(infos);
+            Planning plan = new Planning(ar);
+            try {
+                plan.onlyRegistered();
+                if ((list = plan.get_activities()) != null)
+                    nbAct = list.size();
+                else
+                    nbAct = 0;
+                setDataToView();
             }
-            catch (JSONException e)
+            catch(JSONException e)
             {
-
-            }
-            catch (Exception e)
-            {
-                System.err.println("ERREUR MOTHER FOCKER");
                 e.printStackTrace();
             }
-
-        /*int i = 0;
-        while (i < 10)
-        {
-            HashMap<String, String> map = new HashMap<String, String>();
-            map.put("jour", "jour" + i);
-            map.put("activity", "activity" + i);
-            map.put("room", "room" + i);
-            map.put("start", "start" + i);
-            list.add(map);
-            i++;
-        }*/
-
-        setDataToView();
         }
-    }
-
-    public String getStartHour(String way)
-    {
-        String heure = null;
-        Date dateActivity = null;
-        try
-        {
-            dateActivity = formatGet.parse(way);
-            heure = formatHour.format(dateActivity);
-        }
-        catch (Exception e)
-        {
-            return (null);
-        }
-       return (heure);
-    }
-    
-    public String getActivityDayInFrench(String way)
-    {
-        String jour = null;
-        Date dateActivity = null;
-
-        try
-        {
-            dateActivity = formatGet.parse(way);
-            jour = (String) this.date_equivalent.get(formatDay.format(dateActivity));
-        }
-        catch (Exception e)
-        {
-            return (null);
-        }
-        return (jour);
     }
 
     //set la date du début et de la fin de la semaine en cours
