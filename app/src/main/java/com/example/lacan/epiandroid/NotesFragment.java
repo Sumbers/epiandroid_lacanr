@@ -14,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,9 +31,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class NotesFragment extends Fragment implements MyActivity {
+    protected final int SEMESTER = 0;
+    protected final int MODULES = 1;
+    protected final int MARKS = 2;
+
+
     private View rootview = null;
     private String _session = null;
     private ListView listNotes = null;
+    private Spinner moduleSpinner = null;
+    private String semester_code = null;
+    private String semester_num = null;
+    private List<String> moduleChoices = new LinkedList<String>();
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static NotesFragment newInstance(String session) {
@@ -44,6 +55,11 @@ public class NotesFragment extends Fragment implements MyActivity {
         rootview = inflater.inflate(R.layout.fragment_notes, container, false);
         System.out.println("Fragment notes : Session : " + this._session);
         listNotes = (ListView) rootview.findViewById(R.id.listNotes);
+        moduleSpinner = (Spinner) rootview.findViewById(R.id.moduleSpinner);
+        moduleChoices.add("all");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_spinner_item, moduleChoices);
+        moduleSpinner.setAdapter(adapter);
         getNotes();
         return rootview;
     }
@@ -51,7 +67,8 @@ public class NotesFragment extends Fragment implements MyActivity {
     public void getNotes() {
         if (this._session != null)
         {
-            new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("1", "marks", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.POST, SEMESTER).execute("1", "infos", "token", this._session);
+            new ConnexionTask(this, ConnexionTask.GET, this.MARKS).execute("1", "marks", "token", this._session);
         }
     }
 
@@ -76,7 +93,37 @@ public class NotesFragment extends Fragment implements MyActivity {
             JSONObject obj = null;
             try
             {
-                if (type == ConnexionTask.ARRAY)
+                if (type == this.SEMESTER)
+                {
+                    JSONObject obj2;
+
+                    obj = cont.get_object(infos);
+                    obj2 = obj.getJSONObject("current");
+                    semester_code = obj2.getString("semester_code");
+                    semester_num = obj2.getString("semester_num");
+                    new ConnexionTask(this, ConnexionTask.GET, this.MODULES).execute("1", "modules", "token", this._session);
+                }
+                else if (type == this.MODULES)
+                {
+                    JSONObject tab = cont.get_object(infos);
+                    JSONArray arr = tab.getJSONArray("modules");
+
+                    int i = 0;
+
+                    while (i < arr.length())
+                    {
+                        obj = arr.getJSONObject(i);
+                        if (obj.getString("semester").equals(semester_num))
+                        {
+                            System.out.println("oui.");
+                            moduleChoices.add(obj.getString("codemodule"));
+                        }
+                        else
+                            System.out.println("semester: " + semester_num + " and there it is: " + obj.getString("semester"));
+                        i++;
+                    }
+                }
+                else if (type == this.MARKS)
                 {
                     JSONObject tab = cont.get_object(infos);
                     JSONArray arr = tab.getJSONArray("notes");
