@@ -10,6 +10,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -43,6 +44,13 @@ public class NotesFragment extends Fragment implements MyActivity {
     private String semester_code = null;
     private String semester_num = null;
     private List<String> moduleChoices = new LinkedList<String>();
+    private List<String> moduleID = new LinkedList<String>();
+    private List<Spanned> values = new LinkedList<Spanned>();
+    private ArrayAdapter<Spanned> adapter = null;
+    private JSONArray arr = null;
+    private int listBusy = 0;
+    private int modulesDone = 0;
+    private int lastChoice = 0;
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static NotesFragment newInstance(String session) {
@@ -57,9 +65,70 @@ public class NotesFragment extends Fragment implements MyActivity {
         listNotes = (ListView) rootview.findViewById(R.id.listNotes);
         moduleSpinner = (Spinner) rootview.findViewById(R.id.moduleSpinner);
         moduleChoices.add("all");
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, moduleChoices);
         moduleSpinner.setAdapter(adapter);
+        moduleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                if (listBusy == 0 && modulesDone == 1 && position != lastChoice)
+                {
+                    lastChoice = position;
+                    int i = 0;
+                    String line;
+                    values.clear();
+                    try
+                    {
+                        if (position == 0)
+                        {
+                            listBusy = 1;
+                            while (i < arr.length()) {
+                                JSONObject obj = arr.getJSONObject(i);
+                                line = "Module: " + obj.getString("titlemodule") + "<br/>";
+
+                                line += "Projet: " + obj.getString("title") + "<br/>";
+                                line += "Date: " + obj.getString("date") + "<br/>";
+                                line += "Note: " + obj.getString("final_note") + "<br/>";
+                                line += "Commentaire: " + obj.getString("comment") + "<br/>";
+                                values.add(Html.fromHtml(line));
+                                i++;
+                            }
+                            listBusy = 0;
+                        }
+                        else
+                        {
+                            listBusy = 1;
+                            String module = moduleID.get(position - 1);
+                            while (i < arr.length()) {
+                                JSONObject obj = arr.getJSONObject(i);
+                                if (obj.getString("codemodule").equals(module)) {
+                                    line = "Module: " + obj.getString("titlemodule") + "<br/>";
+
+                                    line += "Projet: " + obj.getString("title") + "<br/>";
+                                    line += "Date: " + obj.getString("date") + "<br/>";
+                                    line += "Note: " + obj.getString("final_note") + "<br/>";
+                                    line += "Commentaire: " + obj.getString("comment") + "<br/>";
+                                    values.add(Html.fromHtml(line));
+                                }
+                                i++;
+                            }
+                            listBusy = 0;
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                    catch (JSONException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
         getNotes();
         return rootview;
     }
@@ -116,20 +185,23 @@ public class NotesFragment extends Fragment implements MyActivity {
                         if (obj.getString("semester").equals(semester_num))
                         {
                             System.out.println("oui.");
-                            moduleChoices.add(obj.getString("codemodule"));
+                            moduleID.add(obj.getString("codemodule"));
+                            moduleChoices.add(obj.getString("title"));
                         }
                         else
                             System.out.println("semester: " + semester_num + " and there it is: " + obj.getString("semester"));
                         i++;
                     }
+                    modulesDone = 1;
                 }
                 else if (type == this.MARKS)
                 {
                     JSONObject tab = cont.get_object(infos);
-                    JSONArray arr = tab.getJSONArray("notes");
+                    arr = tab.getJSONArray("notes");
                     String line;
-                    List<Spanned> values = new LinkedList<Spanned>();
+
                     int i = 0;
+                    listBusy = 1;
                     while (i < arr.length())
                     {
                         obj = arr.getJSONObject(i);
@@ -142,9 +214,10 @@ public class NotesFragment extends Fragment implements MyActivity {
                         values.add(Html.fromHtml(line));
                         i++;
                     }
-                    ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(getActivity(),
+                    adapter = new ArrayAdapter<Spanned>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
                     listNotes.setAdapter(adapter);
+                    listBusy = 0;
                 }
 
             }
