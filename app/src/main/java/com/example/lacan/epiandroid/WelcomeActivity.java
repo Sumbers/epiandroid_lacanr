@@ -34,6 +34,10 @@ public class WelcomeActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
 
+    public String getSession()
+    {
+        return (this._session);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

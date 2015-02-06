@@ -50,6 +50,8 @@ public class AccueilFragment extends Fragment implements MyActivity, MyActivityW
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootview = inflater.inflate(R.layout.accueil_layout, container, false);
+        if (this._session == null)
+            this._session = ((WelcomeActivity)getActivity()).getSession();
         System.out.println("Fragment accueil : Session : " + this._session);
         waitView = (TextView) rootview.findViewById(R.id.wait);
         logView = (TextView) rootview.findViewById(R.id.logTime);
