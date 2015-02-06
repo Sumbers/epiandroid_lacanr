@@ -79,6 +79,9 @@ public class WelcomeActivity extends ActionBarActivity
             case 6:
                 obj = SusieFragment.newInstance(this._session);
                 break;
+            case 7:
+                obj = TrombiFragment.newInstance(this._session);
+                break;
 
         }
 

@@ -39,9 +39,9 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 
 class DownloadImgTask extends AsyncTask<String, Void, Bitmap> {
-    AccueilFragment _obj;
+    MyActivityWithBMP _obj;
 
-    public DownloadImgTask(AccueilFragment frag) {
+    public DownloadImgTask(MyActivityWithBMP frag) {
         this._obj = frag;
     }
 

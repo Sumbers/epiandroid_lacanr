@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class AccueilFragment extends Fragment implements MyActivity {
+public class AccueilFragment extends Fragment implements MyActivity, MyActivityWithBMP {
     private View rootview = null;
     private String _session = null;
     private String infoUser = null;
