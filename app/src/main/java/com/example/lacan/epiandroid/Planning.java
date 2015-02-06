@@ -23,9 +23,10 @@ public class Planning
 {
     private List<JSONObject> _obj = null;
     private List<JSONObject> _objOnly = null;
+    private List<JSONObject> _objPromo = null;
+    private List<JSONObject> _objModules = null;
     private List<HashMap<String, String>> _activities = null;
     private int _nbAct = 0;
-    private int _nbActOnlyRegistered = 0;
     private SimpleDateFormat formatSent = new SimpleDateFormat("yyyy-MM-dd");
     private SimpleDateFormat formatGet = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SimpleDateFormat formatDay = new SimpleDateFormat("EEEE");
@@ -60,34 +61,123 @@ public class Planning
         }
     }
 
-
-    public void onlyRegistered() throws JSONException {
+    public void onlyMyModules() throws JSONException {
         int only = 0;
         //on compte le nombre d'event ou on est enregistré
         for (int i = _nbAct - 1; i >= 0;i--)
         {
-            if (_obj.get(i).getString("event_registered") != "null")
-                only++;
+            try {
+                if (_obj.get(i).getString("module_registered").compareTo("true") == 0)
+                    only++;
+            }
+            catch (JSONException e)
+            {
+                //on ne fait pas only++
+            }
         }
+        if (only == 0)
+        {
+            _activities = null;
+            return;
+        }
+        else
+        {
+            System.out.println("dans mes modules il y a " + only + " activités");
+            _objModules = new ArrayList<JSONObject>(only);
+            int indexList = 0;
+            //on récupère un objet pour chaque event
+            for (int i = _nbAct - 1; i >= 0; i--) {
+                try
+                {
+                    if (_obj.get(i).getString("module_registered").compareTo("true") == 0) {
+                        _objModules.add(indexList, _obj.get(i));
+                        indexList++;
+                    }
+                }
+                catch (JSONException e)
+                {
+                    //on ne fait rien
+                }
+            }
+            setActivities(indexList, _objModules);
+        }
+    }
+
+    public void onlyPromo(String promo) throws JSONException {
+        int only = 0;
+        //on compte le nombre d'event ou la promo a des activités
+        for (int i = _nbAct - 1; i >= 0;i--)
+        {
+            String sem = null;
+            try {
+                if (((sem = _obj.get(i).getString("semester")) != "null") &&
+                        (sem.compareTo(promo) == 0))
+                    only++;
+            }
+            catch (JSONException E)
+            {
+                //on ne fait pas only++;
+            }
+        }
+        if (only == 0)
+        {
+            _activities = null;
+            return;
+        }
+        else
+        {
+            System.out.println("la promo a " + only + " activités");
+            _objPromo = new ArrayList<JSONObject>(only);
+            int indexList = 0;
+            //on récupère un objet pour chaque event
+            for (int i = _nbAct - 1; i >= 0; i--)
+            {
+                String sem = null;
+                try
+                {
+                    if (((sem = _obj.get(i).getString("semester")) != "null") &&
+                            (sem.compareTo(promo) == 0)) {
+                        _objPromo.add(indexList, _obj.get(i));
+                        indexList++;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //on ne fait rien
+                }
+            }
+            setActivities(only, _objPromo);
+        }
+    }
+
+    public void onlyRegistered() throws JSONException {
+    int only = 0;
+    //on compte le nombre d'event ou on est enregistré
+    for (int i = _nbAct - 1; i >= 0;i--)
+    {
+        if (_obj.get(i).getString("event_registered") != "null")
+            only++;
+    }
+    if (only == 0)
+    {
+        _activities = null;
+        return;
+    }
+    else
+    {
         System.out.println("je ne suis inscrit qu'a " + only + " activités");
         _objOnly = new ArrayList<JSONObject>(only);
         int indexList = 0;
         //on récupère un objet pour chaque event
-        for (int i = _nbAct - 1; i >= 0;i--)
-        {
-            if (_obj.get(i).getString("event_registered") != "null")
-            {
+        for (int i = _nbAct - 1; i >= 0; i--) {
+            if (_obj.get(i).getString("event_registered") != "null") {
                 _objOnly.add(indexList, _obj.get(i));
                 indexList++;
             }
         }
-        if (only > 0)
-        {
-            _nbActOnlyRegistered = only;
-            setActivities(indexList, _objOnly);
-        }
-
+        setActivities(indexList, _objOnly);
     }
+}
 
     private void setActivities(int indexList, List<JSONObject> objOnly) throws JSONException {
         _activities = new ArrayList<HashMap<String, String>>(indexList);
@@ -159,6 +249,7 @@ public class Planning
         });
         String jourPrec = " ";
         String jour = null;
+        //on retire les jours en trop écrit
         for (int i = 0; i < _activities.size();i++)
         {
             if ((jour = _activities.get(i).get("jour")) != null){

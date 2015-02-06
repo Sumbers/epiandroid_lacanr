@@ -40,16 +40,16 @@ public class PlanningFragment extends Fragment implements MyActivity {
     private TextView waitView = null;
     private RadioGroup filtre = null;
     private String infos = null;
+    private String infosUser = null;
     private ListView activityListView = null;
     private SimpleDateFormat formatSent = new SimpleDateFormat("yyyy-MM-dd");
-    private SimpleDateFormat formatGet = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     private SimpleDateFormat formatDay = new SimpleDateFormat("EEEE");
-    private SimpleDateFormat formatHour = new SimpleDateFormat("HH");
     private SimpleDateFormat formatDisplay = new SimpleDateFormat("dd-MM-yyyy");
     List<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
     private SimpleAdapter adapteur = null;
     private int nbAct = 0;
     private int filtreNb;
+    private User me = null;
 
     public static PlanningFragment newInstance(String session) {
         PlanningFragment pf = new PlanningFragment();
@@ -68,12 +68,14 @@ public class PlanningFragment extends Fragment implements MyActivity {
         setTime(0);
         //récuperer les infos de /planning GET
         getWeekActivity();
+        getUser();
         rootview.findViewById(R.id.nextWeekButton).setOnClickListener(new AdapterView.OnClickListener() {
             @Override
             public void onClick(View v)
             {
                 if (list != null)
                     list.clear();
+                infos = null;
                 setTime(1);
                 getWeekActivity();
             }
@@ -84,6 +86,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
             {
                 if (list != null)
                     list.clear();
+                infos = null;
                 setTime(-1);
                 getWeekActivity();
             }
@@ -97,18 +100,24 @@ public class PlanningFragment extends Fragment implements MyActivity {
                 if (list != null)
                     list.clear();
                 setTime(0);
-                getWeekActivity();
+                //getWeekActivity();
+                manage_planning();
             }
         });
-        rootview.findViewById(R.id.promo).setOnClickListener(new AdapterView.OnClickListener() {
+        rootview.findViewById(R.id.myModules).setOnClickListener(new AdapterView.OnClickListener() {
             @Override
             public void onClick(View v)
             {
                 System.out.println("trololo");
                 filtreNb = 1;
+                if (list != null)
+                    list.clear();
+                setTime(0);
+                //getWeekActivity();
+                manage_planning();
             }
         });
-        rootview.findViewById(R.id.all).setOnClickListener(new AdapterView.OnClickListener() {
+        rootview.findViewById(R.id.promo).setOnClickListener(new AdapterView.OnClickListener() {
             @Override
             public void onClick(View v)
             {
@@ -117,10 +126,28 @@ public class PlanningFragment extends Fragment implements MyActivity {
                 if (list != null)
                     list.clear();
                 setTime(0);
-                getWeekActivity();
+                manage_planning();
+
+            }
+        });
+        rootview.findViewById(R.id.all).setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                System.out.println("trololo");
+                filtreNb = 3;
+                if (list != null)
+                    list.clear();
+                setTime(0);
+                manage_planning();
             }
         });
         return rootview;
+    }
+
+    private void getUser() {
+        System.out.println("récupération infos user");
+        new ConnexionTask(this, ConnexionTask.POST, ConnexionTask.OBJECT).execute("1", "infos", "token", this._session);
     }
 
     private void getWeekActivity() {
@@ -130,16 +157,22 @@ public class PlanningFragment extends Fragment implements MyActivity {
         System.out.println("date de de fin" + endToSend);
         new ConnexionTask(this, ConnexionTask.GET, ConnexionTask.ARRAY).execute("3", "planning", "token", this._session,
                 "start", startToSend, "end", endToSend);
-
     }
 
     @Override
     public void onBackgroundTaskCompleted(String s, int typ) throws JSONException {
-        this.infos = s;
-        manage_hostReturn(s);
+        if (typ == 0) {
+            this.infos = s;
+            //manage_hostReturn(s, "planning");
+            manage_planningReturn();
+        }
+        else{
+            this.infosUser = s;
+            manage_userReturn();
+        }
     }
 
-    private void manage_hostReturn(String infos)
+    private void manage_planningReturn()
     {
         if (this.infos.compareTo("io exception") == 0)
         {
@@ -147,43 +180,119 @@ public class PlanningFragment extends Fragment implements MyActivity {
         }
         else
         {
-            JSonContainer cont = new JSonContainer();
-            JSONArray ar = cont.get_array(infos);
-            System.out.println("infos = " + infos );
-            switch (filtreNb)
+            manage_planning();
+        }
+    }
+
+    private void manage_userReturn()
+    {
+        if (this.infosUser.compareTo("io exception") == 0)
+        {
+            System.out.println("Vous êtes déconnécté du serveur");
+        }
+        else
+        {
+            System.out.println("pret stocker les infos utilisateur !");
+            manage_user();
+        }
+    }
+
+    private void manage_user() {
+        JSonContainer cont = new JSonContainer();
+        JSONObject obj = cont.get_next_valueObj(infosUser);
+        me = new User(obj);
+
+    }
+
+   /* private void manage_hostReturn(String infos, String retour)
+    {
+        if (this.infos.compareTo("io exception") == 0)
+        {
+            System.out.println("Vous êtes déconnécté du serveur");
+        }
+        else
+        {
+            if (retour.compareTo("planning") == 0)
             {
-                case 0:
-                {
-                    Planning plan = new Planning(ar);
-                    try {
-                        plan.onlyRegistered();
-                        if ((list = plan.get_activities()) != null)
-                            nbAct = list.size();
-                        else
-                            nbAct = 0;
-                    }
-                    catch(JSONException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    break;
-                }
-               case 1:
-                {
-                    break;
-                }
-                case 2:
-                {
-                    Planning plan = new Planning(ar);
+                manage_planning();
+            }
+            else if (retour.compareTo("user") == 0)
+            {
+                System.out.println("pret stocker les infos utilisateur !");
+            }
+        }
+    }*/
+
+    private void manage_planning() {
+        JSonContainer cont = new JSonContainer();
+        JSONArray ar = cont.get_array(infos);
+        System.out.println("infos = " + infos);
+        Planning plan = new Planning(ar);
+        switch (filtreNb)
+        {
+            case 0:
+            {
+                try {
+                    plan.onlyRegistered();
                     if ((list = plan.get_activities()) != null)
                         nbAct = list.size();
                     else
                         nbAct = 0;
-                    break;
                 }
+                catch(JSONException e)
+                {
+                    e.printStackTrace();
+                }
+                break;
             }
-            setDataToView();
+            case 1:
+            {
+                try {
+                    plan.onlyMyModules();
+                    if ((list = plan.get_activities()) != null)
+                        nbAct = list.size();
+                    else
+                        nbAct = 0;
+                }
+                catch(JSONException e)
+                {
+                    e.printStackTrace();
+                }
+                break;
+            }
+            case 2:
+            {
+                if (me != null)
+                {
+                    String promo = null;
+                    if ((promo = me.get_promo()) != null) {
+                        try {
+                            System.out.println("La promo est : " + promo);
+                            plan.onlyPromo(promo);
+                            if ((list = plan.get_activities()) != null)
+                            {
+                                nbAct = list.size();
+                            }
+                            else
+                                nbAct = 0;
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                break;
+            }
+            case 3:
+            {
+                if ((list = plan.get_activities()) != null)
+                    nbAct = list.size();
+                else
+                    nbAct = 0;
+                break;
+            }
         }
+        setDataToView();
+
     }
 
     //set la date du début et de la fin de la semaine en cours
@@ -250,7 +359,7 @@ public class PlanningFragment extends Fragment implements MyActivity {
         {
             waitView.setVisibility(View.GONE);
             activityListView.setVisibility(View.VISIBLE);
-            this.period.setText("Du Lundi " + startToSend +  "\nAu Lundi " + endToSend);
+            this.period.setText("Du Lundi " + startToSend +  "\nAu Dimanche " + endToSend);
             String[] from = {"jour", "activity", "room", "start"};
             int[] to = {R.id.jour, R.id.activity, R.id.room, R.id.hour};
             this.adapteur = new SimpleAdapter(getActivity(), list,

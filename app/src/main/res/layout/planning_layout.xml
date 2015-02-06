@@ -35,7 +35,7 @@
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_below="@id/periode"
         android:id="@+id/filtre">
 
@@ -43,8 +43,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="enregistré"
+            android:text="je suis inscrit"
             android:id="@+id/register"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="mes modules"
+            android:id="@+id/myModules"/>
+
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
