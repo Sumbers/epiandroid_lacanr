@@ -52,6 +52,7 @@ public class NotesFragment extends Fragment implements MyActivity {
     private int listBusy = 0;
     private int modulesDone = 0;
     private int lastChoice = 0;
+    private TextView wait;
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static NotesFragment newInstance(String session) {
@@ -64,6 +65,7 @@ public class NotesFragment extends Fragment implements MyActivity {
         rootview = inflater.inflate(R.layout.fragment_notes, container, false);
         System.out.println("Fragment notes : Session : " + this._session);
         listNotes = (ListView) rootview.findViewById(R.id.listNotes);
+        wait = (TextView) rootview.findViewById(R.id.wait);
         moduleSpinner = (Spinner) rootview.findViewById(R.id.moduleSpinner);
         moduleChoices.add("all");
         spinnerAdapter = new ArrayAdapter<String>(getActivity(),
@@ -73,6 +75,7 @@ public class NotesFragment extends Fragment implements MyActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
+                wait.setVisibility(View.VISIBLE);
                 if (listBusy == 0 && modulesDone == 1 && position != lastChoice)
                 {
                     lastChoice = position;
@@ -221,6 +224,7 @@ public class NotesFragment extends Fragment implements MyActivity {
                             System.out.println("notes: " +  i);
                         i++;
                     }
+                    wait.setVisibility(View.GONE);
                     listAdapter = new ArrayAdapter<Spanned>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
                     listNotes.setAdapter(listAdapter);
