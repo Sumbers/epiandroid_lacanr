@@ -1,19 +1,32 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.example.lacan.epiandroid.ProjectFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <ListView android:layout_width="match_parent"
-        android:layout_height="507dp"
-        android:id="@+id/listProjects"
-        android:layout_gravity="center_horizontal|bottom" />
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:id="@+id/filtreProjet">
 
-    <CheckBox
+    <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mes projets"
-        android:id="@+id/checkBoxMyProjects"
-        android:layout_gravity="center_horizontal|top"
-        android:checked="false" />
+        android:checked="true"
+        android:text="je suis inscrit"
+        android:id="@+id/myProjects"/>
 
-</FrameLayout>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="tout"
+            android:id="@+id/allProjects"/>
+    </RadioGroup>
+    <!-- TODO: Update blank fragment layout -->
+    <ListView android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:id="@+id/listProjects"
+        android:layout_below="@id/filtreProjet"
+        android:layout_gravity="center_horizontal|bottom"/>
+
+</RelativeLayout>

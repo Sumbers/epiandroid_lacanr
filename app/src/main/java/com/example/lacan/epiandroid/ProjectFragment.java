@@ -10,9 +10,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +34,10 @@ public class ProjectFragment extends Fragment implements MyActivity {
     private View rootview = null;
     private String _session = null;
     private ListView listProjects = null;
+    private RadioButton myprojects = null;
+    private RadioButton allProjects = null;
+    private int filtreNb = 0;
+    private String _infos = null;
 
     //permet d'envoyer des données à l'initialisation du fragment
     public static ProjectFragment newInstance(String session) {
@@ -44,6 +50,24 @@ public class ProjectFragment extends Fragment implements MyActivity {
         rootview = inflater.inflate(R.layout.fragment_project, container, false);
         System.out.println("Fragment notes : Session : " + this._session);
         listProjects = (ListView) rootview.findViewById(R.id.listProjects);
+        myprojects = (RadioButton) rootview.findViewById(R.id.myProjects);
+        allProjects = (RadioButton) rootview.findViewById(R.id.allProjects);
+        myprojects.setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                filtreNb = 0;
+                manage_project();
+            }
+        });
+
+        allProjects.setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                filtreNb = 1;
+                manage_project();
+            }
+        });
         getProjects();
         return rootview;
     }
@@ -56,7 +80,7 @@ public class ProjectFragment extends Fragment implements MyActivity {
     }
 
     public void onBackgroundTaskCompleted(String infos, int type) {
-        //this.infoUser = infos;
+        this._infos = infos;
         System.out.println("page notes retour telechargement : " + infos);
         manage_hostReturn(infos, type);
     }
@@ -70,45 +94,59 @@ public class ProjectFragment extends Fragment implements MyActivity {
         {
             System.out.println("Vous êtes déconnecté du serveur");
         }
-        else
-        {
-            JSonContainer cont = new JSonContainer();
-            JSONObject obj = null;
-            try
-            {
-                if (type == ConnexionTask.ARRAY)
-                {
+        else {
+            manage_project();
+        }
+    }
+
+    private void manage_project() {
+        JSonContainer cont = new JSonContainer();
+        JSONObject obj = null;
+        try {
                     /*JSONObject tab = cont.get_object(infos);
                     JSONArray arr = tab.getJSONArray("notes");*/
-                    JSONArray arr = cont.get_array(infos);
-                    String line;
-                    List<Spanned> values = new LinkedList<Spanned>();
-                    int i = 0;
-                    while (i < arr.length())
+            JSONArray arr = cont.get_array(_infos);
+            String line ="";
+            List<Spanned> values = new LinkedList<Spanned>();
+            int i = 0;
+            while (i < arr.length()) {
+                obj = arr.getJSONObject(i);
+                if (obj.getString("type_acti").compareTo("Projet") == 0 ||
+                        obj.getString("type_acti").compareTo("Projets") == 0)
+                {
+                    switch (filtreNb)
                     {
-                        obj = arr.getJSONObject(i);
-                        if (obj.getInt("registred") == 1) {
-                            line = "--- INSCRIT ---<br/>";
-                        } else {
-                            line = "NON INSCRIT<br/>";
+                        case 0:
+                        {
+                            if (obj.getInt("registered") == 1) {
+                                line += "Projet: " + obj.getString("project") + "<br/>";
+                                line += "Titre: " + obj.getString("acti_title") + "<br/>";
+                                line += "Module: " + obj.getString("title_module") + "<br/>";
+                                line += "Début: " + obj.getString("begin_acti") + "<br/>";
+                                line += "Fin: " + obj.getString("end_acti") + "<br/>";
+                            }
+                            break;
                         }
-                        line += "Projet: " + obj.getString("project") + "<br/>";
-                        line += "Titre: " + obj.getString("acti_title") + "<br/>";
-                        line += "Module: " + obj.getString("title_module") + "<br/>";
-                        line += "Début: " + obj.getString("begin_acti") + "<br/>";
-                        line += "Fin: " + obj.getString("end_acti") + "<br/>";
-                        values.add(Html.fromHtml(line));
-                        i++;
+                        case 1:
+                        {
+                                line += "Projet: " + obj.getString("project") + "<br/>";
+                                line += "Titre: " + obj.getString("acti_title") + "<br/>";
+                                line += "Module: " + obj.getString("title_module") + "<br/>";
+                                line += "Début: " + obj.getString("begin_acti") + "<br/>";
+                                line += "Fin: " + obj.getString("end_acti") + "<br/>";
+                            break;
+                        }
                     }
-                    ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(getActivity(),
-                            android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                    listProjects.setAdapter(adapter);
+                    values.add(Html.fromHtml(line));
+                    line ="";
                 }
-
+                i++;
             }
-            catch (JSONException e) {
-                e.printStackTrace();
-            }
+            ArrayAdapter<Spanned> adapter = new ArrayAdapter<Spanned>(getActivity(),
+                    android.R.layout.simple_list_item_1, android.R.id.text1, values);
+            listProjects.setAdapter(adapter);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 }
