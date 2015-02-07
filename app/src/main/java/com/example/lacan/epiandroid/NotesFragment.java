@@ -46,7 +46,8 @@ public class NotesFragment extends Fragment implements MyActivity {
     private List<String> moduleChoices = new LinkedList<String>();
     private List<String> moduleID = new LinkedList<String>();
     private List<Spanned> values = new LinkedList<Spanned>();
-    private ArrayAdapter<Spanned> adapter = null;
+    private ArrayAdapter<Spanned> listAdapter = null;
+    private ArrayAdapter<String> spinnerAdapter = null;
     private JSONArray arr = null;
     private int listBusy = 0;
     private int modulesDone = 0;
@@ -65,9 +66,9 @@ public class NotesFragment extends Fragment implements MyActivity {
         listNotes = (ListView) rootview.findViewById(R.id.listNotes);
         moduleSpinner = (Spinner) rootview.findViewById(R.id.moduleSpinner);
         moduleChoices.add("all");
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+        spinnerAdapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, moduleChoices);
-        moduleSpinner.setAdapter(adapter);
+        moduleSpinner.setAdapter(spinnerAdapter);
         moduleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
@@ -115,7 +116,7 @@ public class NotesFragment extends Fragment implements MyActivity {
                             }
                             listBusy = 0;
                         }
-                        adapter.notifyDataSetChanged();
+                        listAdapter.notifyDataSetChanged();
                     }
                     catch (JSONException e)
                     {
@@ -179,6 +180,8 @@ public class NotesFragment extends Fragment implements MyActivity {
 
                     int i = 0;
 
+                    System.out.println("nb modules: " + arr.length());
+
                     while (i < arr.length())
                     {
                         obj = arr.getJSONObject(i);
@@ -192,6 +195,7 @@ public class NotesFragment extends Fragment implements MyActivity {
                             System.out.println("semester: " + semester_num + " and there it is: " + obj.getString("semester"));
                         i++;
                     }
+                    spinnerAdapter.notifyDataSetChanged();
                     modulesDone = 1;
                 }
                 else if (type == this.MARKS)
@@ -202,6 +206,7 @@ public class NotesFragment extends Fragment implements MyActivity {
 
                     int i = 0;
                     listBusy = 1;
+                    System.out.println("nb notes: " + arr.length());
                     while (i < arr.length())
                     {
                         obj = arr.getJSONObject(i);
@@ -212,11 +217,13 @@ public class NotesFragment extends Fragment implements MyActivity {
                         line += "Note: " + obj.getString("final_note") + "<br/>";
                         line += "Commentaire: " + obj.getString("comment") + "<br/>";
                         values.add(Html.fromHtml(line));
+                        if (i % 10 == 0)
+                            System.out.println("notes: " +  i);
                         i++;
                     }
-                    adapter = new ArrayAdapter<Spanned>(getActivity(),
+                    listAdapter = new ArrayAdapter<Spanned>(getActivity(),
                             android.R.layout.simple_list_item_1, android.R.id.text1, values);
-                    listNotes.setAdapter(adapter);
+                    listNotes.setAdapter(listAdapter);
                     listBusy = 0;
                 }
 
