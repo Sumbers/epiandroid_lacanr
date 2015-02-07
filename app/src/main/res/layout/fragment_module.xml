@@ -1,10 +1,39 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" tools:context="com.example.lacan.epiandroid.ModuleFragment">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:text="Chargement des données veuillez patienter..."
+        android:id="@+id/wait"/>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/filtre">
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="tous"
+        android:id="@+id/allModules"/>
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="mon semestre"
+        android:id="@+id/myModule"/>
+
+    </RadioGroup>
     <!-- TODO: Update blank fragment layout -->
     <ListView android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/filtre"
         android:id="@+id/listModules"/>
 
-</FrameLayout>
+</RelativeLayout>
